@@ -1,15 +1,8 @@
-# LaserGRBL [![Donation](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?business=4WQX8HUBXRVUU&no_recurring=0&item_name=LaserGRBL&currency_code=EUR)
-Official website [http://lasergrbl.com](http://lasergrbl.com)
+# GRControl-test-dev 分支
+
+这个分支主要是用来测试和熟悉最新的代码的，可能对这个分支最大的修改就是代码注释，和一些功能的重新组合！
 
 LaserGRBL is a Windows GUI for [GRBL](https://github.com/gnea/grbl/wiki). Unlike other GUI LaserGRBL it is specifically developed for use with laser cutter and engraver. In order to use all of LaserGRBL feature, your engraver must supports laser power modulation through gcode "S" command. LaserGRBL is compatible with [Grbl v0.9](https://github.com/grbl/grbl/) and [Grbl v1.1](https://github.com/gnea/grbl/)
-
-All downloads available at https://github.com/arkypita/LaserGRBL/releases
-
-### Support and Donation
-
-Do you like LaserGRBL? Support development with your donation!
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?business=4WQX8HUBXRVUU&no_recurring=0&item_name=LaserGRBL&currency_code=EUR)
 
 ### Existing Features
 
