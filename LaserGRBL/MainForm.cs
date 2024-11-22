@@ -63,10 +63,10 @@ namespace LaserGRBL
 
 			if (System.Threading.Thread.CurrentThread.Name == null)
 				System.Threading.Thread.CurrentThread.Name = "Main Thread";
-
-			using (SplashScreenForm f = new SplashScreenForm())
+			//载入窗口
+			using (SplashScreenForm f = new SplashScreenForm()) {
 				f.ShowDialog(this);
-
+			}
 			//build main communication object
 			Firmware ftype = Settings.GetObject("Firmware Type", Firmware.Grbl);
 			if (ftype == Firmware.Smoothie)

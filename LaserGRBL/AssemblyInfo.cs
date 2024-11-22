@@ -3,14 +3,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Resources;
-
+//在这里设置基本软件相关信息
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Per modificare le informazioni associate a un assembly
 // occorre quindi modificare i valori di questi attributi.
 [assembly: AssemblyTitle ("Laser GRBL")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("")]
+[assembly: AssemblyCompany ("广东中科普瑞科技有限公司&松山湖材料实验室")]
 [assembly: AssemblyProduct ("Laser GRBL")]
 [assembly: AssemblyCopyright ("Copyright © 2016 - Diego Settimi")]
 [assembly: AssemblyTrademark ("")]
@@ -31,5 +31,5 @@ using System.Resources;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build 
 // utilizzando l'asterisco (*) come descritto di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion ("7.12.0")]
+[assembly: AssemblyVersion ("0.1.0")]
 [assembly: NeutralResourcesLanguage("en")]
