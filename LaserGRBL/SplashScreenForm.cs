@@ -12,6 +12,7 @@ namespace LaserGRBL
 {
 	public partial class SplashScreenForm : Form
 	{
+		//注册字符串
 		private string mVersion;
 
 		public SplashScreenForm()
@@ -19,13 +20,14 @@ namespace LaserGRBL
 			InitializeComponent();
 			this.Size = BackgroundImage.Size;
 			this.DoubleBuffered = true;
-			mVersion = "v" + Program.CurrentVersion.ToString(3);
+			//文字版本和表述
+			mVersion = "广东中科普瑞科技有限公司"+ "v" + Program.CurrentVersion.ToString(3);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-
+			//文字版本绘制
 			SizeF s = e.Graphics.MeasureString(mVersion, Font);
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;

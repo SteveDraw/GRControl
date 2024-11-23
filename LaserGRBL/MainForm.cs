@@ -583,12 +583,10 @@ namespace LaserGRBL
 
 		private void RefreshFormTitle()
 		{
-			string FormTitle = string.Format("LaserGRBL v{0}", Program.CurrentVersion.ToString(3));
-
+			//标题测试
+			string FormTitle = string.Format("Square-R方阻测试仪 V{0}", Program.CurrentVersion.ToString(3));
 			if (Core.Type != Firmware.Grbl)
 				FormTitle = FormTitle + $" (for {Core.Type})";
-
-
 			if (Text != FormTitle) Text = FormTitle;
 		}
 
@@ -711,42 +709,6 @@ namespace LaserGRBL
 			Core.SaveProject(this);
 		}
 
-		private void MNEnglish_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("en"));
-		}
-
-		private void MNItalian_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("it"));
-		}
-
-		private void MNSpanish_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("es"));
-		}
-
-		private void SetLanguage(System.Globalization.CultureInfo ci)
-		{
-			if (ci != null)
-				Settings.SetObject("User Language", ci);
-			else
-				Settings.DeleteObject("User Language");
-
-			if (MessageBox.Show(Strings.LanguageRequireRestartNow, Strings.LanguageRequireRestart, MessageBoxButtons.OKCancel) == DialogResult.OK)
-				Application.Restart();
-		}
-
-		private void helpOnLineToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Core.HelpOnLine();
-		}
-
-		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/faq/");
-		}
-
 		private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
 		{
 			Settings.SetObject("MainForm Splitter Position", splitContainer1.SplitterDistance);
@@ -759,6 +721,7 @@ namespace LaserGRBL
 
 		private void openSessionLogToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			//日志窗口
 			if (Logger.ExistLog)
 				Logger.ShowLog();
 		}
@@ -768,7 +731,36 @@ namespace LaserGRBL
 			openSessionLogToolStripMenuItem.Enabled = Logger.ExistLog;
 			activateExtendedLogToolStripMenuItem.Checked = ComWrapper.ComLogger.Enabled;
 		}
+		#region 语言设置
+		private void SetLanguage(System.Globalization.CultureInfo ci)
+		{
+			//选择语言后，重启应用
+			if (ci != null)
+				Settings.SetObject("User Language", ci);
+			else
+				Settings.DeleteObject("User Language");
 
+			if (MessageBox.Show(Strings.LanguageRequireRestartNow, Strings.LanguageRequireRestart, MessageBoxButtons.OKCancel) == DialogResult.OK)
+				Application.Restart();
+		}
+
+		private void MNEnglish_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("en"));
+		}
+		private void polishToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("pl-PL"));
+		}
+		private void MNItalian_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("it"));
+		}
+
+		private void MNSpanish_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("es"));
+		}
 		private void MNFrench_Click(object sender, EventArgs e)
 		{
 			SetLanguage(new System.Globalization.CultureInfo("fr"));
@@ -803,31 +795,187 @@ namespace LaserGRBL
 		{
 			SetLanguage(new System.Globalization.CultureInfo("sk-SK"));
 		}
-
-		private void MNGrblEmulator_Click(object sender, EventArgs e)
+		private void hungarianToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			GrblEmulator.WebSocketEmulator.Start();
+			SetLanguage(new System.Globalization.CultureInfo("hu-HU"));
 		}
 
+		private void czechToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("cs-CZ"));
+		}
+		private void greekToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("el-GR"));
+		}
 
-        private void styleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Scheme schema = (Scheme)(sender as ToolStripMenuItem).Tag;
-            Settings.SetObject("Color Schema", schema);
-            ColorScheme.CurrentScheme = (Scheme)schema;
-            RefreshColorSchema();
-        }
+		private void turkishToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("tr-TR"));
+		}
+
+		private void traditionalChineseToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("zh-TW"));
+		}
+		private void romanianToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("ro-RO"));
+		}
+
+		private void dutchToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("nl-NL"));
+		}
+
+		private void ukrainianToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("uk"));
+		}
+
+		private void japaneseToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetLanguage(new System.Globalization.CultureInfo("ja-JP"));
+		}
+
+		#endregion
+		#region 标题栏按钮
+		private void facebookCommunityToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://www.facebook.com/groups/486886768471991");
+		}
+		private void MNGrblEmulator_Click(object sender, EventArgs e)
+		{
+			//ESP8266测试
+			GrblEmulator.WebSocketEmulator.Start();
+		}
+		private void donateToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//打开网址（捐款）
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/donate");
+		}
+		private void installCH340DriverToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//运行安装CH341SER.EXE，好像是用于串口的
+			try
+			{
+				string fname = System.IO.Path.Combine(GrblCore.ExePath, "Driver\\CH341SER.EXE");
+				System.Diagnostics.Process.Start(fname);
+			}
+			catch { Tools.Utils.OpenLink("https://www.google.it/search?q=ch340+drivers"); }
+		}
+		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//官网网址打开
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/faq/");
+		}
+
+		private void helpOnLineToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//在线帮助打开（也是打开网址）
+			Core.HelpOnLine();
+		}
+
+		private void orturSupportGroupToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturfacebook/");
+		}
+
+		private void orturWebsiteToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturwebsite/");
+		}
+
+		private void youtubeChannelToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturYTchannel/");
+		}
+
+		private void firmwareToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-firmware/");
+		}
+
+		private void manualsDownloadToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-manuals/");
+		}
+		private void MnGrayscaleTest_Click(object sender, EventArgs e)
+		{
+			//速度功率测试
+			Generator.PowerVsSpeedForm.CreateAndShowDialog(Core);
+		}
+
+		private void MnCuttingTest_Click(object sender, EventArgs e)
+		{
+			//方块剪切测试
+			Generator.CuttingTest.CreateAndShowDialog(Core);
+		}
+
+		private void MnAccuracyTest_Click(object sender, EventArgs e)
+		{
+			//打开矢量测试图像
+			Core.OpenFile("LaserGRBL.Generator.SVG.LaserGRBL-accuracy-test-file.svg", false);
+		}
+
+		private void shakeTestToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			//shake轴测试
+			Generator.ShakeTest.CreateAndShowDialog(Core);
+		}
+		private void orturSupportAndFeedbackToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortursupport/");
+		}
+		private void styleToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Scheme schema = (Scheme)(sender as ToolStripMenuItem).Tag;
+			Settings.SetObject("Color Schema", schema);
+			ColorScheme.CurrentScheme = (Scheme)schema;
+			RefreshColorSchema();
+		}
+		private void activateExtendedLogToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!ComWrapper.ComLogger.Enabled)
+			{
+				using (SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog())
+				{
+					sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+					sfd.Filter = "Communication log|*.txt";
+					sfd.AddExtension = true;
+					sfd.OverwritePrompt = false;
+					sfd.FileName = "comlog.txt";
+					sfd.Title = "Select extended log filename";
+					DialogResult dialogResult = DialogResult.Cancel;
+					try
+					{
+						dialogResult = sfd.ShowDialog(this);
+					}
+					catch (System.Runtime.InteropServices.COMException)
+					{
+						sfd.AutoUpgradeEnabled = false;
+						dialogResult = sfd.ShowDialog(this);
+					}
+					if (dialogResult == DialogResult.OK && sfd.FileName != null)
+					{
+						string message = ComWrapper.ComLogger.StartLog(sfd.FileName);
+						Logger.LogMessage("ComLog", message);
+					}
+				}
+			}
+			else
+			{
+				string message = ComWrapper.ComLogger.StopLog();
+				if (message != null) Logger.LogMessage("ComLog", message);
+			}
+		}
+
+		#endregion
 
 		private void grblConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			GrblConfig.CreateAndShowDialog(this, Core);
 		}
-
-		private void donateToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/donate");
-		}
-
 
 		protected override void OnKeyUp(KeyEventArgs e)
 		{
@@ -888,26 +1036,6 @@ namespace LaserGRBL
 			Core.OpenFile(null, true);
 		}
 
-		private void hungarianToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("hu-HU"));
-		}
-
-		private void czechToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("cs-CZ"));
-		}
-
-		private void installCH340DriverToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			try
-			{
-				string fname = System.IO.Path.Combine(GrblCore.ExePath, "Driver\\CH341SER.EXE");
-				System.Diagnostics.Process.Start(fname);
-			}
-			catch { Tools.Utils.OpenLink("https://www.google.it/search?q=ch340+drivers"); }
-		}
-
 		private void flashGrblFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			FlashGrbl form = new FlashGrbl();
@@ -919,9 +1047,7 @@ namespace LaserGRBL
 				else
 					MessageBox.Show("Error: cannot flash firmware.", "Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-
 			form.Dispose();
-
 		}
 
 		private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -929,44 +1055,7 @@ namespace LaserGRBL
 			flashGrblFirmwareToolStripMenuItem.Enabled = (Core.MachineStatus == GrblCore.MacStatus.Disconnected);
 		}
 
-		private void activateExtendedLogToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (!ComWrapper.ComLogger.Enabled)
-			{
-				using (SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog())
-				{
-					sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-					sfd.Filter = "Communication log|*.txt";
-					sfd.AddExtension = true;
-					sfd.OverwritePrompt = false;
-					sfd.FileName = "comlog.txt";
-					sfd.Title = "Select extended log filename";
-
-					DialogResult dialogResult = DialogResult.Cancel;
-					try
-					{
-						dialogResult = sfd.ShowDialog(this);
-					}
-					catch (System.Runtime.InteropServices.COMException)
-					{
-						sfd.AutoUpgradeEnabled = false;
-						dialogResult = sfd.ShowDialog(this);
-					}
-
-					if (dialogResult == DialogResult.OK && sfd.FileName != null)
-					{
-						string message = ComWrapper.ComLogger.StartLog(sfd.FileName);
-						Logger.LogMessage("ComLog", message);
-					}
-				}
-			}
-			else
-			{
-				string message = ComWrapper.ComLogger.StopLog();
-				if (message != null) Logger.LogMessage("ComLog", message);
-			}
-		}
-
+		
 		private DispatcherTimer dropDispatcherTimer;
 		private string droppedFile;
 
@@ -986,7 +1075,6 @@ namespace LaserGRBL
 				if (files.Length == 1)
 				{
 					droppedFile = files[0];
-
 					// call via DispatcherTimer to unblock the source of the drag-event (e.g. Explorer-Window)
 					if (dropDispatcherTimer == null)
 					{
@@ -1047,18 +1135,12 @@ namespace LaserGRBL
 		{
 			MnNotifyMinorVersion.Checked = !MnNotifyMinorVersion.Checked;
 			Settings.SetObject("Auto Update Build", MnNotifyMinorVersion.Checked);
-
-			//if (MnNotifyNewVersion.Checked && MnNotifyMinorVersion.Checked)
-			//	GitHub.CheckVersion();
 		}
 
 		private void MnNotifyPreRelease_Click(object sender, EventArgs e)
 		{
 			MnNotifyPreRelease.Checked = !MnNotifyPreRelease.Checked;
 			Settings.SetObject("Auto Update Pre", MnNotifyPreRelease.Checked);
-
-			//if (MnNotifyNewVersion.Checked && MnNotifyPreRelease.Checked)
-			//	GitHub.CheckVersion();
 		}
 
 		private void MnCheckNow_Click(object sender, EventArgs e)
@@ -1070,41 +1152,6 @@ namespace LaserGRBL
 		private void MnMaterialDB_Click(object sender, EventArgs e)
 		{
 			PSHelper.PSEditorForm.CreateAndShowDialog(this);
-		}
-
-		private void polishToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("pl-PL"));
-		}
-
-		private void orturSupportGroupToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturfacebook/");
-		}
-
-		private void orturWebsiteToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturwebsite/");
-		}
-
-		private void traditionalChineseToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("zh-TW"));
-		}
-
-		private void youtubeChannelToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturYTchannel/");
-		}
-
-		private void firmwareToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-firmware/");
-		}
-
-		private void manualsDownloadToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-manuals/");
 		}
 
 		private void MultipleInstanceTimer_Tick(object sender, EventArgs e)
@@ -1122,10 +1169,7 @@ namespace LaserGRBL
 			}
 		}
 
-		private void orturSupportAndFeedbackToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortursupport/");
-		}
+		
 
 		private void TTLinkToNews_Click(object sender, EventArgs e)
 		{
@@ -1141,47 +1185,12 @@ namespace LaserGRBL
 			ConnectionForm.ConfigFromDiscovery(WiFiDiscovery.DiscoveryForm.CreateAndShowDialog(this));
 		}
 
-		private void facebookCommunityToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Tools.Utils.OpenLink(@"https://www.facebook.com/groups/486886768471991");
-		}
-
-		private void greekToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("el-GR"));
-		}
-
-		private void turkishToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("tr-TR"));
-		}
-
 		private void BtnUnlockFromStuck_Click(object sender, EventArgs e)
 		{
 			if (MessageBox.Show(Strings.WarnBufferStuckUnlockText, Strings.WarnBufferStuckUnlockTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0, "http://lasergrbl.com/faq", "issues") == DialogResult.OK)
 			{
 				Core.UnlockFromBufferStuck(false);
 			}
-		}
-
-		private void romanianToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("ro-RO"));
-		}
-
-		private void dutchToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("nl-NL"));
-		}
-
-		private void ukrainianToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("uk"));
-		}
-
-		private void japaneseToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetLanguage(new System.Globalization.CultureInfo("ja-JP"));
 		}
 
 		private void TTTStatus_DoubleClick(object sender, EventArgs e)
@@ -1202,26 +1211,6 @@ namespace LaserGRBL
 		private void laserUsageStatsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			LaserUsage.CreateAndShowDialog(Core);
-		}
-
-		private void MnGrayscaleTest_Click(object sender, EventArgs e)
-		{
-			Generator.PowerVsSpeedForm.CreateAndShowDialog(Core);
-		}
-
-		private void MnCuttingTest_Click(object sender, EventArgs e)
-		{
-			Generator.CuttingTest.CreateAndShowDialog(Core);
-		}
-
-		private void MnAccuracyTest_Click(object sender, EventArgs e)
-		{
-			Core.OpenFile("LaserGRBL.Generator.SVG.LaserGRBL-accuracy-test-file.svg", false);
-		}
-
-		private void shakeTestToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Generator.ShakeTest.CreateAndShowDialog(Core);
 		}
 
         private void autoSizeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1338,10 +1327,19 @@ namespace LaserGRBL
             }
         }
 
-	}
+        private void MMn_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void StatusBar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+    }
 
 
-	public class MMnRenderer : ToolStripProfessionalRenderer
+    public class MMnRenderer : ToolStripProfessionalRenderer
 	{
 		public MMnRenderer() : base(new CustomMenuColor()) { }
 

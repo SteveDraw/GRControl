@@ -1414,7 +1414,6 @@ namespace LaserGRBL
 		{
 			if (mTP.LastIssue == DetectedIssue.Unknown && MachineStatus == MacStatus.Run && InProgram)
 				SetIssue(user ? DetectedIssue.ManualDisconnect : DetectedIssue.UnexpectedDisconnect);
-
 			try
 			{
 				if (com.IsOpen)
@@ -1425,10 +1424,8 @@ namespace LaserGRBL
 
 				TX.Stop();
 				RX.Stop();
-
 				lock (this)
 				{ ClearQueue(false); } //non resettare l'elenco delle cose mandate così da non sbiancare la lista
-
 				SetStatus(MacStatus.Disconnected);
 			}
 			catch (Exception ex)

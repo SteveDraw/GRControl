@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("广东中科普瑞科技有限公司&松山湖材料实验室")]
 [assembly: AssemblyProduct ("Laser GRBL")]
-[assembly: AssemblyCopyright ("Copyright © 2016 - Diego Settimi")]
+[assembly: AssemblyCopyright ("Copyright © 2018 - Diego Settimi")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 // Se si imposta ComVisible su false, i tipi in questo assembly non saranno visibili 

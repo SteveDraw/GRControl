@@ -546,7 +546,6 @@ namespace LaserGRBL
 
 		}
 
-
 		internal void OnColorChange()
 		{
             GrblPanel.OnColorChange();

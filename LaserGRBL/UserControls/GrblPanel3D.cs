@@ -716,6 +716,7 @@ namespace LaserGRBL.UserControls
 
 		private void DoGDIDraw(PaintEventArgs e)
 		{
+			//视图坐标和标签文本
 			if (Core == null) return;
 			const int top = 12;
 			using (Brush b = new SolidBrush(ColorScheme.PreviewText))
@@ -725,10 +726,10 @@ namespace LaserGRBL.UserControls
 				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				// use z
 				bool useZ = mLastWPos.Z != 0 || mLastMPos.Z != 0 || forcez;
-				string text = "         X          Y";
+				string text = "                   X          Y";
 				if (useZ) text += "          Z    ";
 				// last position
-				text += $"\nMCO {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
+				text += $"\n实际机台坐标: {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
 				if (useZ) text += $" {FormatCoord(mLastMPos.Z)}";
 				// working offset
 				if (Core.WorkingOffset != GPoint.Zero)
@@ -740,7 +741,7 @@ namespace LaserGRBL.UserControls
 				if (mMouseWorldPosition != null)
 				{
 					PointF pos = (PointF)mMouseWorldPosition;
-					text += $"\nPTR {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
+					text += $"\n当前鼠标位置坐标 {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
 					if (useZ) text += "          ";
 				}
 				Size size = MeasureText(text, font);

@@ -34,8 +34,8 @@
 			this.SuspendLayout();
 			// 
 			// timer1
-			// 
-			this.timer1.Interval = 2000;
+			// 定时器时长控制
+			this.timer1.Interval = 500;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
 			// SplashScreenForm
