@@ -7,12 +7,12 @@ using System.Resources;
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Per modificare le informazioni associate a un assembly
 // occorre quindi modificare i valori di questi attributi.
-[assembly: AssemblyTitle ("Laser GRBL")]
+[assembly: AssemblyTitle ("GRControl")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("广东中科普瑞科技有限公司&松山湖材料实验室")]
-[assembly: AssemblyProduct ("Laser GRBL")]
-[assembly: AssemblyCopyright ("Copyright © 2018 - Diego Settimi")]
+[assembly: AssemblyProduct ("运动控制&数据分析集成软件")]
+[assembly: AssemblyCopyright ("Copyright © 2018 - 2024")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 // Se si imposta ComVisible su false, i tipi in questo assembly non saranno visibili 

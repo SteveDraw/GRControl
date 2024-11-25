@@ -73,6 +73,14 @@ namespace LaserGRBL.UserControls
 		private static Exception FatalException;
 
 		private bool mShowCursor = true;
+		/// <summary>
+		/// 软件正限位，依次为X,Y,Z,A,B
+		/// </summary>
+		public double[]	SoftPosLimitPosi = new double[5];
+		/// <summary>
+		/// 软件负限位，依次为X,Y,Z,A,B
+		/// </summary>
+		public double[] SoftNegLimitPosi = new double[5];
 		public bool ShowCursor
 		{
             get => mShowCursor;
@@ -122,6 +130,9 @@ namespace LaserGRBL.UserControls
 
 		public AutoResetEvent RR = new AutoResetEvent(true);		//redraw required
 		Tools.ThreadObject TH = null;	//drawing thread
+		/// <summary>
+		/// 实例化
+		/// </summary>
 		public GrblPanel3D()
 		{
 			InitializeComponent();
@@ -154,7 +165,7 @@ namespace LaserGRBL.UserControls
 			TH = new Tools.ThreadObject(DrawScene, 10000, true, "OpenGL", InitializeOpenGL, ThreadPriority.Lowest, ApartmentState.STA, RR);
 			TH.Start();
 
-			/*
+            /*
 			// TEST JOG 
 			Task.Factory.StartNew(() => {
 				Random RNG = new Random();
@@ -168,6 +179,14 @@ namespace LaserGRBL.UserControls
 				}
 			});
 			*/
+            #region 限位初始化设置
+            SoftPosLimitPosi[0]=0;
+			SoftPosLimitPosi[1] = 0;
+			SoftPosLimitPosi[2] = 0;
+			SoftNegLimitPosi[0] = 0;
+			SoftNegLimitPosi[1] = 0;
+			SoftNegLimitPosi[2] = 0;
+			#endregion
 		}
 
 		private static double GetRulerStep(double n)
@@ -1135,6 +1154,16 @@ namespace LaserGRBL.UserControls
 
 			if (InvalidateTimer.Expired)
 				Invalidate();
+		}
+		/// <summary>
+		/// 检查目标位置是否超过所设限位
+		/// </summary>
+		/// <param name="point_"></param>
+		/// <returns></returns>
+		private bool CheckLimitPosi(GPoint point_) {
+			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2]) return false;
+			if (point_.X > SoftPosLimitPosi[0] || point_.Y > SoftPosLimitPosi[1] || point_.Z > SoftPosLimitPosi[2]) return false;
+			return true;
 		}
 
 		private void Grbl3D_OnLoadingPercentageChange()
