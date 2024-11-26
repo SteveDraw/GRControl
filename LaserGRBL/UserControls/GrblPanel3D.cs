@@ -17,6 +17,7 @@ namespace LaserGRBL.UserControls
     [ToolboxBitmap(typeof(SceneControl), "GrblScene")]
 	public partial class GrblPanel3D : UserControl, IGrblPanel
 	{
+		
 		// last mouse position
 		private Point? mLastMousePos = null;
 		// current mouse world position
@@ -73,14 +74,6 @@ namespace LaserGRBL.UserControls
 		private static Exception FatalException;
 
 		private bool mShowCursor = true;
-		/// <summary>
-		/// 软件正限位，依次为X,Y,Z,A,B
-		/// </summary>
-		public double[]	SoftPosLimitPosi = new double[5];
-		/// <summary>
-		/// 软件负限位，依次为X,Y,Z,A,B
-		/// </summary>
-		public double[] SoftNegLimitPosi = new double[5];
 		public bool ShowCursor
 		{
             get => mShowCursor;
@@ -179,14 +172,6 @@ namespace LaserGRBL.UserControls
 				}
 			});
 			*/
-            #region 限位初始化设置
-            SoftPosLimitPosi[0]=0;
-			SoftPosLimitPosi[1] = 0;
-			SoftPosLimitPosi[2] = 0;
-			SoftNegLimitPosi[0] = 0;
-			SoftNegLimitPosi[1] = 0;
-			SoftNegLimitPosi[2] = 0;
-			#endregion
 		}
 
 		private static double GetRulerStep(double n)
@@ -287,7 +272,9 @@ namespace LaserGRBL.UserControls
 				ExceptionManager.OnHandledException(ex, true);
 			}
 		}
-
+		/// <summary>
+		/// 绘制主视图
+		/// </summary>
 		[System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
 		private void DrawScene()
 		{
@@ -372,10 +359,12 @@ namespace LaserGRBL.UserControls
 				OpenGL.Disable(OpenGL.GL_BLEND);
 				OpenGL.Disable(OpenGL.GL_LINE_SMOOTH);
 				CheckError(OpenGL, "BlendDisable");
-				// main hud
+				// 绘制十字交叉点
 				DrawPointer();
 				CheckError(OpenGL, "Pointer");
+				//绘制刻度尺
 				DrawRulers();
+				DrawSoftPosiLimit();
 				CheckError(OpenGL, "Rulers");
 				OpenGL.Flush();
 				CheckError(OpenGL, "Flush");
@@ -482,7 +471,11 @@ namespace LaserGRBL.UserControls
 			// save last size
 			mLastControlSize = new PointF(Width, Height);
 		}
-
+		/// <summary>
+		/// 屏幕双击，位置响应
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void GrblPanel3D_DoubleClick(object sender, MouseEventArgs e)
 		{
 			if (Settings.GetObject("Click N Jog", true) && mMouseWorldPosition != null)
@@ -517,28 +510,14 @@ namespace LaserGRBL.UserControls
 			DisposeGrbl3D();
 			mThreadDraw?.Dispose();
 		}
-
-		private void DrawPointer()
-		{
-			if (Core == null) return;
-			// draw laser cross
-			GLColor color = new GLColor();
-			color.FromColor(mPointerColor);
-			OpenGL.Color(color);
-			OpenGL.LineWidth(PointerSize);
-			OpenGL.Begin(OpenGL.GL_LINES);
-			Vertex pointerPos = new Vertex(Core.WorkPosition.X, Core.WorkPosition.Y, 0.2f);
-			double size = mGrid.GridSize * 1.5;
-			OpenGL.Vertex(pointerPos.X - size, pointerPos.Y, pointerPos.Z);
-			OpenGL.Vertex(pointerPos.X + size, pointerPos.Y, pointerPos.Z);
-			OpenGL.End();
-			OpenGL.Begin(OpenGL.GL_LINES);
-			OpenGL.Vertex(pointerPos.X, pointerPos.Y - size, pointerPos.Z);
-			OpenGL.Vertex(pointerPos.X, pointerPos.Y + size, pointerPos.Z);
-			OpenGL.End();
-			OpenGL.Flush();
-		}
-
+		
+		/// <summary>
+		/// 视图缩放单位
+		/// </summary>
+		/// <param name="mm"></param>
+		/// <param name="worldWidth"></param>
+		/// <param name="uom"></param>
+		/// <returns></returns>
 		private string HumanReadableLength(int mm, double worldWidth, out string uom)
         {
             if (worldWidth > 10000)
@@ -563,13 +542,68 @@ namespace LaserGRBL.UserControls
 			Size size = TextRenderer.MeasureText(text, mTextFont);
             return new SizeF(size.Width * 0.8f, size.Height * 0.8f);
         }
-
-		private void DrawText(string text, double x, double y, GLColor color)
+		#region 视图相关绘制事件
+		/// <summary>
+		/// 软限位绘制事件
+		/// </summary>
+		private void DrawSoftPosiLimit() {
+			if (Core == null) return;
+			// draw laser cross
+			GLColor color = new GLColor();
+			color.FromColor(Color.YellowGreen);
+			OpenGL.Color(color);
+			OpenGL.LineWidth(PointerSize);
+			//底部
+			OpenGL.Begin(OpenGL.GL_LINES);
+			Vertex pointerPos = new Vertex(Core.WorkPosition.X, Core.WorkPosition.Y, 0.2f);
+			OpenGL.Vertex(Core.SoftNegLimitPosi[0], Core.SoftNegLimitPosi[1], pointerPos.Z);
+			OpenGL.Vertex(Core.SoftPosLimitPosi[0], Core.SoftNegLimitPosi[1], pointerPos.Z);
+			OpenGL.End();
+			//顶部
+			OpenGL.Begin(OpenGL.GL_LINES);
+			OpenGL.Vertex(Core.SoftNegLimitPosi[0], Core.SoftPosLimitPosi[1], pointerPos.Z);
+			OpenGL.Vertex(Core.SoftPosLimitPosi[0], Core.SoftPosLimitPosi[1], pointerPos.Z);
+			OpenGL.End();
+			//左侧
+			OpenGL.Begin(OpenGL.GL_LINES);
+			OpenGL.Vertex(Core.SoftNegLimitPosi[0], Core.SoftPosLimitPosi[1], pointerPos.Z);
+			OpenGL.Vertex(Core.SoftNegLimitPosi[0], Core.SoftNegLimitPosi[1], pointerPos.Z);
+			OpenGL.End();
+			//右侧
+			OpenGL.Begin(OpenGL.GL_LINES);
+			OpenGL.Vertex(Core.SoftPosLimitPosi[0], Core.SoftNegLimitPosi[1], pointerPos.Z);
+			OpenGL.Vertex(Core.SoftPosLimitPosi[0], Core.SoftPosLimitPosi[1], pointerPos.Z);
+			OpenGL.End();
+			OpenGL.Flush();
+		}
+		/// <summary>
+		/// 绘制十字交叉点，用于实时渲染机台位置
+		/// </summary>
+		private void DrawPointer()
 		{
-            OpenGL.DrawText((int)x, (int)y, color.R, color.G, color.B, mTextFont.FontFamily.Name, mTextFont.Size, text);
-        }
-
-        public void DrawRulers()
+			if (Core == null) return;
+			// draw laser cross
+			GLColor color = new GLColor();
+			color.FromColor(Color.OrangeRed);
+			//color.FromColor(mPointerColor);
+			OpenGL.Color(color);
+			OpenGL.LineWidth(PointerSize);
+			OpenGL.Begin(OpenGL.GL_LINES);
+			Vertex pointerPos = new Vertex(Core.WorkPosition.X, Core.WorkPosition.Y, 0.2f);
+			double size = mGrid.GridSize * 1.5;
+			OpenGL.Vertex(pointerPos.X - size, pointerPos.Y, pointerPos.Z);
+			OpenGL.Vertex(pointerPos.X + size, pointerPos.Y, pointerPos.Z);
+			OpenGL.End();
+			OpenGL.Begin(OpenGL.GL_LINES);
+			OpenGL.Vertex(pointerPos.X, pointerPos.Y - size, pointerPos.Z);
+			OpenGL.Vertex(pointerPos.X, pointerPos.Y + size, pointerPos.Z);
+			OpenGL.End();
+			OpenGL.Flush();
+		}
+		/// <summary>
+		/// 绘制尺子
+		/// </summary>
+		public void DrawRulers()
 		{
 			// clear left ruler background
 			OpenGL.Enable(OpenGL.GL_SCISSOR_TEST);
@@ -598,66 +632,66 @@ namespace LaserGRBL.UserControls
 			// half step
 			int halfStep = (int)(step / 2);
 			// get ratio
-            double wRatio = Width / (mCamera.Right - mCamera.Left);
+			double wRatio = Width / (mCamera.Right - mCamera.Left);
 			// unit of measure
 			string uom = string.Empty;
-            HumanReadableLength(0, worldWidth, out uom); //call it just to be sure to have uom loaded by worldWidth
+			HumanReadableLength(0, worldWidth, out uom); //call it just to be sure to have uom loaded by worldWidth
 			int? minDrawingX = null;
-            int? maxDrawingX = null;
-            int? minDrawingY = null;
-            int? maxDrawingY = null;
-            if (Core?.LoadedFile?.Range.DrawingRange.ValidRange == true)
-            {
-                minDrawingX = (int)Core.LoadedFile.Range.DrawingRange.X.Min;
-                maxDrawingX = (int)Core.LoadedFile.Range.DrawingRange.X.Max;
-                minDrawingY = (int)Core.LoadedFile.Range.DrawingRange.Y.Min;
-                maxDrawingY = (int)Core.LoadedFile.Range.DrawingRange.Y.Max;
-            }
+			int? maxDrawingX = null;
+			int? minDrawingY = null;
+			int? maxDrawingY = null;
+			if (Core?.LoadedFile?.Range.DrawingRange.ValidRange == true)
+			{
+				minDrawingX = (int)Core.LoadedFile.Range.DrawingRange.X.Min;
+				maxDrawingX = (int)Core.LoadedFile.Range.DrawingRange.X.Max;
+				minDrawingY = (int)Core.LoadedFile.Range.DrawingRange.Y.Min;
+				maxDrawingY = (int)Core.LoadedFile.Range.DrawingRange.Y.Max;
+			}
 			bool showBoundingBox = Core?.ShowBoundingBox.Value ?? false;
-            // draw horizontal
-            for (int i = (int)mCamera.Left + (int)(mPadding.Left / wRatio); i <= (int)mCamera.Right - (int)(mPadding.Right / wRatio); i += 1)
+			// draw horizontal
+			for (int i = (int)mCamera.Left + (int)(mPadding.Left / wRatio); i <= (int)mCamera.Right - (int)(mPadding.Right / wRatio); i += 1)
 			{
 				bool canDraw = i % step == 0;
-                if (showBoundingBox && (minDrawingX != null || maxDrawingX != null))
-                {
+				if (showBoundingBox && (minDrawingX != null || maxDrawingX != null))
+				{
 					canDraw &=
 						i < (minDrawingX - halfStep) ||
 						(i > (minDrawingX + halfStep) && i < (maxDrawingX - halfStep)) ||
 						i > (maxDrawingX + halfStep);
-                    canDraw |= i == maxDrawingX || i == minDrawingX;
-                }
-                if (canDraw)
+					canDraw |= i == maxDrawingX || i == minDrawingX;
+				}
+				if (canDraw)
 				{
 					string text = HumanReadableLength(i, worldWidth, out uom);
 					SizeF sizeProp = MeasureOpenGlText(text);
 					double x = i * wRatio - mCamera.Left * wRatio - sizeProp.Width / 4f;
 					double y = mPadding.Bottom - sizeProp.Height;
 					DrawText(text, x, y, i == minDrawingX || i == maxDrawingX ? mTextBoundingColor : mTextColor);
-                }
+				}
 			}
 			// get ratio
 			double hRatio = Height / (mCamera.Top - mCamera.Bottom);
-            // draw vertical
-            for (int i = (int)mCamera.Bottom + (int)(mPadding.Bottom / hRatio); i <= (int)mCamera.Top - (int)(mPadding.Top / hRatio); i += 1)
-            {
-                bool canDraw = i % step == 0;
-                if (showBoundingBox && (minDrawingY != null || maxDrawingY != null))
-                {
-                    canDraw &=
-                        i < (minDrawingY - halfStep) ||
-                        (i > (minDrawingY + halfStep) && i < (maxDrawingY - halfStep)) ||
-                        i > (maxDrawingY + halfStep);
-                    canDraw |= i == maxDrawingY || i == minDrawingY;
-                }
-                if (canDraw)
+			// draw vertical
+			for (int i = (int)mCamera.Bottom + (int)(mPadding.Bottom / hRatio); i <= (int)mCamera.Top - (int)(mPadding.Top / hRatio); i += 1)
+			{
+				bool canDraw = i % step == 0;
+				if (showBoundingBox && (minDrawingY != null || maxDrawingY != null))
+				{
+					canDraw &=
+						i < (minDrawingY - halfStep) ||
+						(i > (minDrawingY + halfStep) && i < (maxDrawingY - halfStep)) ||
+						i > (maxDrawingY + halfStep);
+					canDraw |= i == maxDrawingY || i == minDrawingY;
+				}
+				if (canDraw)
 				{
 					string text = HumanReadableLength(i, worldWidth, out uom);
 					SizeF sizeProp = MeasureOpenGlText(text);
-                    double x = mPadding.Left - sizeProp.Width;
+					double x = mPadding.Left - sizeProp.Width;
 					double y = i * hRatio - mCamera.Bottom * hRatio - sizeProp.Height / 4f;
-                    DrawText(text, x, y, i == minDrawingY || i == maxDrawingY ? mTextBoundingColor : mTextColor);
-                }
-            }
+					DrawText(text, x, y, i == minDrawingY || i == maxDrawingY ? mTextBoundingColor : mTextColor);
+				}
+			}
 			// clear uom  background
 			OpenGL.Enable(OpenGL.GL_SCISSOR_TEST);
 			OpenGL.Scissor(0, 0, mPadding.Left, mPadding.Bottom);
@@ -666,10 +700,17 @@ namespace LaserGRBL.UserControls
 
 			// draw unit of measure
 			SizeF uomSizeProp = MeasureOpenGlText(uom);
-			DrawText(uom, mPadding.Left - uomSizeProp.Width -20, mPadding.Bottom - uomSizeProp.Height, mTextBoundingColor);
+			DrawText(uom, mPadding.Left - uomSizeProp.Width - 20, mPadding.Bottom - uomSizeProp.Height, mTextBoundingColor);
 
-            OpenGL.Flush();
+			OpenGL.Flush();
 		}
+		private void DrawText(string text, double x, double y, GLColor color)
+		{
+			OpenGL.DrawText((int)x, (int)y, color.R, color.G, color.B, mTextFont.FontFamily.Name, mTextFont.Size, text);
+		}
+		#endregion
+
+
 
 		Tools.SimpleCrono FpsCrono;
 		protected override void OnPaint(PaintEventArgs e)
@@ -727,15 +768,37 @@ namespace LaserGRBL.UserControls
 			}
 			catch { }
 		}
-
+		/// <summary>
+		/// 文字格式转换
+		/// </summary>
+		/// <param name="coord"></param>
+		/// <returns></returns>
 		private string FormatCoord(float coord)
 		{
 			return string.Format("{0,10:######0.000}", coord);
 		}
-
+		/// <summary>
+		/// 值mm/s转成mm/min
+		/// </summary>
+		/// <param name="val_"></param>
+		/// <returns></returns>
+		public float ValSecondToMinute(float val_) {
+			return val_ *60;
+		}
+		/// <summary>
+		/// 值mm/min转成mm/ms
+		/// </summary>
+		/// <param name="val_"></param>
+		/// <returns></returns>
+		public float ValMinuteToSecond(float val_) {
+			return val_ / 60;
+		}
+		/// <summary>
+		/// 视图坐标和标签文本
+		/// </summary>
+		/// <param name="e"></param>
 		private void DoGDIDraw(PaintEventArgs e)
 		{
-			//视图坐标和标签文本
 			if (Core == null) return;
 			const int top = 12;
 			using (Brush b = new SolidBrush(ColorScheme.PreviewText))
@@ -746,10 +809,10 @@ namespace LaserGRBL.UserControls
 				// use z
 				bool useZ = mLastWPos.Z != 0 || mLastMPos.Z != 0 || forcez;
 				string text = "                   X          Y";
-				if (useZ) text += "          Z    ";
+				if (!useZ) text += "          Z    ";
 				// last position
-				text += $"\n实际机台坐标: {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
-				if (useZ) text += $" {FormatCoord(mLastMPos.Z)}";
+				text += $"\n实际机台坐标(mm): {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
+				if (!useZ) text += $" {FormatCoord(mLastMPos.Z)}";
 				// working offset
 				if (Core.WorkingOffset != GPoint.Zero)
 				{
@@ -760,9 +823,11 @@ namespace LaserGRBL.UserControls
 				if (mMouseWorldPosition != null)
 				{
 					PointF pos = (PointF)mMouseWorldPosition;
-					text += $"\n当前鼠标位置坐标 {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
+					text += $"\n当前鼠标位置坐标(mm): {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
 					if (useZ) text += "          ";
 				}
+				
+				text += $"\n进给速率和主轴速度(mm/s): {FormatCoord(mCurF)} {FormatCoord(mCurS)}";
 				Size size = MeasureText(text, font);
 				Point point = new Point(Width - size.Width - mPadding.Right, top);
 				DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
@@ -824,7 +889,7 @@ namespace LaserGRBL.UserControls
                         e.Graphics.DrawString(text, font, b, point.X, point.Y);
                     }
                 }
-
+				//显示视图右下角标签文本
                 if (mGrbl3D == null)
 				{
 					text = $"{Strings.TipsBasicUsage}\r\n{Strings.TipsZoom}\r\n{Strings.TipsPan}\r\n{Strings.TipsJog}\r\n\r\n";
@@ -877,7 +942,7 @@ namespace LaserGRBL.UserControls
 
 		private void DrawCross(Graphics g, Pen pCross, Point point)
         {
-			const int halfCrossSize = 4;
+            const int halfCrossSize = 4;
             g.DrawLine(pCross, new Point(mPadding.Left, point.Y), new Point(point.X - 5, point.Y));
             g.DrawLine(pCross, new Point(point.X + halfCrossSize, point.Y), new Point(Width - mPadding.Right, point.Y));
             g.DrawLine(pCross, new Point(point.X, mPadding.Top), new Point(point.X, point.Y - halfCrossSize));
@@ -896,17 +961,29 @@ namespace LaserGRBL.UserControls
 			}
 			return shortcut;
 		}
-
+		/// <summary>
+		/// 右下角标签文本框
+		/// </summary>
+		/// <param name="e"></param>
+		/// <param name="point"></param>
+		/// <param name="size"></param>
+		/// <param name="color"></param>
+		/// <param name="alfa"></param>
 		private void DrawOverlay(PaintEventArgs e, Point point, Size size, Color color, int alfa)
 		{
-			Color c = Color.FromArgb(alfa, color);
-			using (Brush brush = new SolidBrush(c))
-			using (GraphicsPath path = Tools.Graph.RoundedRect(new Rectangle(point.X - 5, point.Y - 5, size.Width, size.Height), 7))
-			{
-				e.Graphics.FillPath(brush, path);
-			}
-		}
-
+            Color c = Color.FromArgb(alfa, color);
+            using (Brush brush = new SolidBrush(c))
+            using (GraphicsPath path = Tools.Graph.RoundedRect(new Rectangle(point.X - 5, point.Y - 5, size.Width, size.Height), 7))
+            {
+                e.Graphics.FillPath(brush, path);
+            }
+        }
+		/// <summary>
+		/// 测量右下角文本框高宽高
+		/// </summary>
+		/// <param name="text"></param>
+		/// <param name="font"></param>
+		/// <returns></returns>
 		private Size MeasureText(string text, Font font)
 		{
 			Size size = TextRenderer.MeasureText(text, font);
@@ -1141,30 +1218,25 @@ namespace LaserGRBL.UserControls
 		}
 
 		PeriodicEventTimer InvalidateTimer = new Tools.PeriodicEventTimer(TimeSpan.FromSeconds(1), true);
+		/// <summary>
+		/// 数据更新事件
+		/// </summary>
 		public void TimerUpdate()
 		{
 			if (Core != null && (mLastWPos != Core.WorkPosition || mLastMPos != Core.MachinePosition || mCurF != Core.CurrentF || mCurS != Core.CurrentS))
 			{
 				mLastWPos = Core.WorkPosition;
 				mLastMPos = Core.MachinePosition;
-				mCurF = Core.CurrentF;
-				mCurS = Core.CurrentS;
+				//数值转换为mm/s
+				mCurF = ValMinuteToSecond(Core.CurrentF);
+				mCurS = ValMinuteToSecond(Core.CurrentS);
 				RR.Set();
 			}
 
 			if (InvalidateTimer.Expired)
 				Invalidate();
 		}
-		/// <summary>
-		/// 检查目标位置是否超过所设限位
-		/// </summary>
-		/// <param name="point_"></param>
-		/// <returns></returns>
-		private bool CheckLimitPosi(GPoint point_) {
-			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2]) return false;
-			if (point_.X > SoftPosLimitPosi[0] || point_.Y > SoftPosLimitPosi[1] || point_.Z > SoftPosLimitPosi[2]) return false;
-			return true;
-		}
+		
 
 		private void Grbl3D_OnLoadingPercentageChange()
 		{

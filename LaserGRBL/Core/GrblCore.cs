@@ -25,7 +25,7 @@ namespace LaserGRBL
 	{ Grbl, Smoothie, Marlin, VigoWork }
 
 	/// <summary>
-	/// Description of CommandThread.
+	/// 命令线程相关核心和描述
 	/// </summary>
 	public class GrblCore
 	{
@@ -39,14 +39,19 @@ namespace LaserGRBL
 		[Serializable]
 		public class ThreadingMode
 		{
+			#region 字段
 			public readonly int StatusQuery;
 			public readonly int TxLong;
 			public readonly int TxShort;
 			public readonly int RxLong;
 			public readonly int RxShort;
 			private readonly string Name;
+            #endregion
+            #region 属性
 
-			public ThreadingMode(int query, int txlong, int txshort, int rxlong, int rxshort, string name)
+            #endregion
+
+            public ThreadingMode(int query, int txlong, int txshort, int rxlong, int rxshort, string name)
 			{ StatusQuery = query; TxLong = txlong; TxShort = txshort; RxLong = rxlong; RxShort = rxshort; Name = name; }
 
 			public static ThreadingMode Slow
@@ -324,8 +329,24 @@ namespace LaserGRBL
 
 		private string mDetectedIP = null;
 		private bool mDoingSend = false;
+		/// <summary>
+		/// 软件正限位，依次为X,Y,Z,A,B
+		/// </summary>
+		public double[] SoftPosLimitPosi = new double[5];
+		/// <summary>
+		/// 软件负限位，依次为X,Y,Z,A,B
+		/// </summary>
+		public double[] SoftNegLimitPosi = new double[5];
+		/// <summary>
+		/// 软件正限位预留量
+		/// </summary>
+		public double[] SoftPosLDistance = new double[5];
+		/// <summary>
+		/// 软件负限位预留量
+		/// </summary>
+		public double[] SoftNegLDistance = new double[5];
 
-        public RetainedSetting<bool> ShowLaserOffMovements { get; } = new RetainedSetting<bool>("ShowLaserOffMovements", true);
+		public RetainedSetting<bool> ShowLaserOffMovements { get; } = new RetainedSetting<bool>("ShowLaserOffMovements", true);
         public RetainedSetting<bool> ShowExecutedCommands { get; } = new RetainedSetting<bool>("ShowExecutedCommands", true);
 		public RetainedSetting<bool> ShowPerformanceDiagnostic { get; } = new RetainedSetting<bool>("ShowPerformanceDiagnostic", false);
         public RetainedSetting<bool> ShowBoundingBox { get; } = new RetainedSetting<bool>("ShowBoundingBox", true);
@@ -382,6 +403,14 @@ namespace LaserGRBL
 
 			if (GrblVersion != null)
 				CSVD.LoadAppropriateCSV(GrblVersion); //load setting for last known version
+			#region 限位初始化设置
+			SoftPosLimitPosi[0] = 285;
+			SoftPosLimitPosi[1] = 275;
+			SoftPosLimitPosi[2] = 0;
+			SoftNegLimitPosi[0] = 5;
+			SoftNegLimitPosi[1] = 0;
+			SoftNegLimitPosi[2] = 0;
+			#endregion
 		}
 
 		internal void HotKeyOverride(HotKeysManager.HotKey.Actions action)
@@ -492,12 +521,16 @@ namespace LaserGRBL
 			try { System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(RefreshConfigOnConnect)); }
 			catch { }
 		}
-
+		/// <summary>
+		/// 所有轴原点复位
+		/// </summary>
 		internal virtual void SendHomingCommand()
 		{
 			EnqueueCommand(new GrblCommand("$H"));
 		}
-
+		/// <summary>
+		/// 解除报警锁定
+		/// </summary>
 		internal virtual void SendUnlockCommand()
 		{
 			EnqueueCommand(new GrblCommand("$X"));
@@ -1367,7 +1400,11 @@ namespace LaserGRBL
 			lock (this)
 			{ mQueuePtr.Enqueue(cmd.Clone() as GrblCommand); }
 		}
-
+		/// <summary>
+		/// 配置串口和初始化
+		/// </summary>
+		/// <param name="wraptype"></param>
+		/// <param name="conf"></param>
 		public void Configure(ComWrapper.WrapperType wraptype, params object[] conf)
 		{
 			if (wraptype == ComWrapper.WrapperType.UsbSerial && (com == null || com.GetType() != typeof(ComWrapper.UsbSerial)))
@@ -1383,7 +1420,9 @@ namespace LaserGRBL
 
 			com.Configure(conf);
 		}
-
+		/// <summary>
+		/// 打开串口
+		/// </summary>
 		public void OpenCom()
 		{
 			try
@@ -1409,7 +1448,10 @@ namespace LaserGRBL
 				System.Windows.Forms.MessageBox.Show(ex.Message, Strings.BoxConnectErrorTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 			}
 		}
-
+		/// <summary>
+		/// 关闭串口
+		/// </summary>
+		/// <param name="user"></param>
 		public void CloseCom(bool user)
 		{
 			if (mTP.LastIssue == DetectedIssue.Unknown && MachineStatus == MacStatus.Run && InProgram)
@@ -1433,7 +1475,9 @@ namespace LaserGRBL
 				Logger.LogException("CloseCom", ex);
 			}
 		}
-
+		/// <summary>
+		/// 退出程序和事件
+		/// </summary>
 		internal void Exiting()
 		{
 			try { CloseCom(true); }
@@ -1592,7 +1636,93 @@ namespace LaserGRBL
 		{ get { return GrblVersion != null && GrblVersion >= new GrblVersionInfo(1, 1); } }
 
 		#endregion
+		#region 常规运动控制相关
+		public bool CheckLimitPosi(GPoint point_)
+		{
+			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2]) return false;
+			if (point_.X > SoftPosLimitPosi[0] || point_.Y > SoftPosLimitPosi[1] || point_.Z > SoftPosLimitPosi[2]) return false;
+			return true;
+		}
+		/// <summary>
+		/// 限位检查，点动
+		/// </summary>
+		/// <param name="dir">方向</param>
+		/// <param name="point_">当前位置</param>
+		/// <param name="step_">步长</param>
+		/// <returns></returns>
+		public bool CheckLimitPosi(JogDirection dir,GPoint point_,double step_)
+		{
+			double[] stepList = new double[3];
+			double[] point = new double[3] {point_.X,point_.Y,point_.Z};
+			if (dir == JogDirection.NE || dir == JogDirection.E || dir == JogDirection.SE)
+				stepList[0] = step_;
+			if (dir == JogDirection.NW || dir == JogDirection.W || dir == JogDirection.SW)
+				stepList[0] = step_;
+			if (dir == JogDirection.NW || dir == JogDirection.N || dir == JogDirection.NE)
+				stepList[1] = step_;
+			if (dir == JogDirection.SW || dir == JogDirection.S || dir == JogDirection.SE)
+				stepList[1] = step_;
+			if (dir == JogDirection.Zdown)
+				stepList[2] = step_;
+			if (dir == JogDirection.Zup)
+				stepList[2] = step_;
+			for (int i = 0; i < 3; i++) point[i] += stepList[i];
+			if (point[0] < SoftNegLimitPosi[0] || point[1] < SoftNegLimitPosi[1] || point[2] < SoftNegLimitPosi[2]) return false;
+			if (point[0] > SoftPosLimitPosi[0] || point[1] > SoftPosLimitPosi[1] || point[2] > SoftPosLimitPosi[2]) return false;
+			return true;
+		}
+		/// <summary>
+		/// 视图点击位置后点位运动
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="fast"></param>
+		public void JogToPosition(PointF target, bool fast) => JogToPosition(target, fast ? 100000 : JogSpeed); //da chiamare su doppio click
+		public void JogToPosition(PointF target, float speed)
+		{
+			target = LimitToBound(target); //if soft limit enabled -> crop to machine area
 
+			if (!JogEnabled) //cannot jog now
+				return;
+			//限位检查
+			GPoint posi = new GPoint {X=target.X,Y=target.Y ,Z=0};
+			if (!CheckLimitPosi(posi)) return;
+			if (!SupportTrueJogging) //old firmware
+				EnqueueJogV09(target, speed);
+			else if (!ContinuosJogEnabled)  //continuous jog disabled
+				EnqueueJogV11(target, speed);
+			else
+				ContinuousJog.ToPosition(target, speed);
+		}
+
+		/// <summary>
+		/// 摇杆点击运动
+		/// </summary>
+		/// <param name="dir"></param>
+		/// <param name="fast"></param>
+		public void JogToDirection(JogDirection dir, bool fast) => JogToDirection(dir, fast, JogStep);
+		public void JogToDirection(JogDirection dir, bool fast, decimal step) => JogToDirection(dir, fast ? 100000 : JogSpeed, step);
+		public void JogToDirection(JogDirection dir, float speed, decimal step)
+		{
+			if (dir == JogDirection.Abort)
+				throw new ArgumentException("无效操作", "dir");
+			if (dir == JogDirection.Position)
+				throw new ArgumentException("无效操作", "dir");
+
+			if (!JogEnabled)                                                                        // cannot jog now
+				return;                                                                                 // ignore request
+            GPoint posi = new GPoint { X = MachinePosition.X, Y = MachinePosition.Y, Z = MachinePosition.Z };
+            if (!CheckLimitPosi(dir,posi, Convert.ToDouble(step))) return;
+            if (!SupportTrueJogging)                                                            // old firmware
+
+				EnqueueJogV09(dir, step, speed);                                                        // immediate enqueue old command
+			else if (!ContinuosJogEnabled || dir == JogDirection.Zdown || dir == JogDirection.Zup)  // continuous jog disabled && Z movement
+				EnqueueJogV11(dir, step, speed);                                                        // immediate enqueue new command
+			else                                                                                    // continuoud jog enabled
+				ContinuousJog.ToDirection(dir, speed);                                                    // assign jog target
+		}
+		/// <summary>
+		/// jog使能判断
+		/// </summary>
 		public bool JogEnabled
 		{
 			get
@@ -1603,90 +1733,11 @@ namespace LaserGRBL
 					return IsConnected && (MachineStatus == GrblCore.MacStatus.Idle || MachineStatus == GrblCore.MacStatus.Run) && !InProgram;
 			}
 		}
-
-		public void JogToPosition(PointF target, bool fast) => JogToPosition(target, fast ? 100000 : JogSpeed); //da chiamare su doppio click
-		public void JogToPosition(PointF target, float speed)
-		{
-			target = LimitToBound(target); //if soft limit enabled -> crop to machine area
-
-			if (!JogEnabled) //cannot jog now
-				return;
-
-			if (!SupportTrueJogging) //old firmware
-				EnqueueJogV09(target, speed);
-			else if (!ContinuosJogEnabled)	//continuous jog disabled
-				EnqueueJogV11(target, speed);
-			else
-				ContinuousJog.ToPosition(target, speed);
-		}
-
-		public void ContinuousJogToPosition(PointF target, float speed) 
-		{
-			target = LimitToBound(target); //if soft limit enabled -> crop to machine area
-
-			if (!JogEnabled) //cannot jog now
-				return;
-
-			if (!SupportTrueJogging)                                                            // old firmware
-				return; //not supported by firmware
-
-			ContinuousJog.ToPosition(target, speed);
-		}
-
-		public void JogToDirection(JogDirection dir, bool fast) => JogToDirection(dir, fast, JogStep);
-		public void JogToDirection(JogDirection dir, bool fast, decimal step) => JogToDirection(dir, fast ? 100000 : JogSpeed, step);
-		public void JogToDirection(JogDirection dir, float speed, decimal step) 
-		{
-			if (dir == JogDirection.Abort)
-				throw new ArgumentException("Invalid option", "dir");
-			if (dir == JogDirection.Position)
-				throw new ArgumentException("Invalid option", "dir");
-
-			if (!JogEnabled)																		// cannot jog now
-				return;																					// ignore request
-			
-			if (!SupportTrueJogging)															// old firmware
-				EnqueueJogV09(dir, step, speed);														// immediate enqueue old command
-			else if (!ContinuosJogEnabled || dir == JogDirection.Zdown || dir == JogDirection.Zup)  // continuous jog disabled && Z movement
-				EnqueueJogV11(dir, step, speed);                                                        // immediate enqueue new command
-			else                                                                                    // continuoud jog enabled
-				ContinuousJog.ToDirection(dir, speed);                                                    // assign jog target
-		}
-
-		public void ContinuousJogToDirection(JogDirection dir, float speed)
-		{
-			if (dir == JogDirection.Abort)
-				throw new ArgumentException("Invalid option", "dir");
-			if (dir == JogDirection.Position)
-				throw new ArgumentException("Invalid option", "dir");
-
-			if (!JogEnabled)                                                                        // cannot jog now
-				return;
-
-			if (!SupportTrueJogging)                                                            // old firmware
-				return; //not supported by firmware
-
-			ContinuousJog.ToDirection(dir, speed);
-		}
-
-		public void JogAbort() //da chiamare su ButtonUp
-		{
-			if (!SupportTrueJogging)																// old firmware
-				;																						// abort not supported
-			else if (!ContinuosJogEnabled)															// continuous jog disabled
-				;                                                                                       // we can abort but we don't want
-			else                                                                                    // continuoud jog enabled
-				ContinuousJog.Abort();														               // assign jog target
-		}
-
-		public void ContinuousJogAbort() //da chiamare su ButtonUp
-		{
-			if (!SupportTrueJogging)                                                                // old firmware
-				return;                                                                                       // abort not supported
-			
-			ContinuousJog.Abort();                                                                     // assign jog target
-		}
-
+		/// <summary>
+		/// 如果设置了控制器的限位，限位引导
+		/// </summary>
+		/// <param name="target"></param>
+		/// <returns></returns>
 		private PointF LimitToBound(PointF target)
 		{
 			if (Configuration.SoftLimit)
@@ -1698,7 +1749,63 @@ namespace LaserGRBL
 
 			return target;
 		}
+		/// <summary>
+		/// 点动结束
+		/// </summary>
+		public void JogAbort() //da chiamare su ButtonUp
+		{
+			if (!SupportTrueJogging)                                                                // old firmware
+				;                                                                                       // abort not supported
+			else if (!ContinuosJogEnabled)                                                          // continuous jog disabled
+				;                                                                                       // we can abort but we don't want
+			else                                                                                    // continuoud jog enabled
+				ContinuousJog.Abort();                                                                     // assign jog target
+		}
+		#endregion
+		#region 无用代码
+		public void ContinuousJogToPosition(PointF target, float speed)
+		{
+			target = LimitToBound(target); //if soft limit enabled -> crop to machine area
 
+			if (!JogEnabled) //cannot jog now
+				return;
+
+			if (!SupportTrueJogging)                                                            // old firmware
+				return; //not supported by firmware
+
+			ContinuousJog.ToPosition(target, speed);
+		}
+		public void ContinuousJogToDirection(JogDirection dir, float speed)
+		{
+			if (dir == JogDirection.Abort)
+				throw new ArgumentException("无效操作", "dir");
+			if (dir == JogDirection.Position)
+				throw new ArgumentException("无效操作", "dir");
+
+			if (!JogEnabled)                                                                        // cannot jog now
+				return;
+
+			if (!SupportTrueJogging)                                                            // old firmware
+				return; //not supported by firmware
+
+			ContinuousJog.ToDirection(dir, speed);
+		}
+		public void ContinuousJogAbort() //da chiamare su ButtonUp
+		{
+			if (!SupportTrueJogging)                                                                // old firmware
+				return;                                                                                       // abort not supported
+
+			ContinuousJog.Abort();                                                                     // assign jog target
+		}
+		#endregion
+		
+
+		/// <summary>
+		/// 点动运动相关
+		/// </summary>
+		/// <param name="dir"></param>
+		/// <param name="step"></param>
+		/// <param name="speed"></param>
 		private void EnqueueJogV09(JogDirection dir, decimal step, float speed) //emulate jog using plane G-Code
 		{
 			if (dir == JogDirection.Home)
@@ -1803,7 +1910,6 @@ namespace LaserGRBL
 		//	//SendImmediate(0x85); //abort previous jog
 		//	//EnqueueCommand(new GrblCommand(string.Format("$J=G90X{0}Y{1}F{2}", target.X.ToString("0.00", NumberFormatInfo.InvariantInfo), target.Y.ToString("0.00", NumberFormatInfo.InvariantInfo), mPrenotedJogSpeed)));
 		//}
-
 
 
 		public class ContinuousJog

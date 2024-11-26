@@ -119,8 +119,7 @@ namespace LaserGRBL
 				TbSpeed.SmallChange = Math.Max(1, curMax / 20);
 			}
 		}
-
-	}
+    }
 
     public class StepBar : System.Windows.Forms.TrackBar
     {
