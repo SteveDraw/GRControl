@@ -18,10 +18,13 @@ namespace LaserGRBL
 		public SplashScreenForm()
 		{
 			InitializeComponent();
-			this.Size = BackgroundImage.Size;
+			
+			int Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
+			int Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
+			if (BackgroundImage.Size.Width > 1200) this.Size = new Size(800, 600);
 			this.DoubleBuffered = true;
 			//文字版本和表述
-			mVersion = "广东中科普瑞科技有限公司"+ "v" + Program.CurrentVersion.ToString(3);
+			mVersion = "广东中科普瑞科技有限公司"+"-Square方阻测试仪"+ "V" + Program.CurrentVersion.ToString(3);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)

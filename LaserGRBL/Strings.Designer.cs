@@ -950,7 +950,7 @@ namespace LaserGRBL {
         }
         
         /// <summary>
-        ///   查找类似 基本用法 的本地化字符串。
+        ///   查找类似 基本操作和用法 的本地化字符串。
         /// </summary>
         internal static string TipsBasicUsage {
             get {
@@ -959,7 +959,7 @@ namespace LaserGRBL {
         }
         
         /// <summary>
-        ///   查找类似 JOG：双击任意点（或双击） 的本地化字符串。
+        ///   查找类似 JOG：双击任意点 的本地化字符串。
         /// </summary>
         internal static string TipsJog {
             get {

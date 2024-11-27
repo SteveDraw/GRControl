@@ -35,6 +35,10 @@ namespace LaserGRBL
 		public static string GCODE_STD_HEADER = "G90 (use absolute coordinates)";
 		public static string GCODE_STD_PASSES = ";(Uncomment if you want to sink Z axis)\r\n;G91 (use relative coordinates)\r\n;G0 Z-1 (sinks the Z axis, 1mm)\r\n;G90 (use absolute coordinates)";
 		public static string GCODE_STD_FOOTER = "G0 X0 Y0 Z0 (move back to origin)";
+		/// <summary>
+		/// 限位标志
+		/// </summary>
+		public bool CheckLimitPosiFlag = false;
 
 		[Serializable]
 		public class ThreadingMode
@@ -1639,8 +1643,17 @@ namespace LaserGRBL
 		#region 常规运动控制相关
 		public bool CheckLimitPosi(GPoint point_)
 		{
-			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2]) return false;
-			if (point_.X > SoftPosLimitPosi[0] || point_.Y > SoftPosLimitPosi[1] || point_.Z > SoftPosLimitPosi[2]) return false;
+			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2])
+			{
+				CheckLimitPosiFlag = true;
+				return false;
+			}
+			if (point_.X > SoftPosLimitPosi[0] || point_.Y > SoftPosLimitPosi[1] || point_.Z > SoftPosLimitPosi[2])
+			{
+				CheckLimitPosiFlag = true;
+				return false;
+			}
+			CheckLimitPosiFlag = false;
 			return true;
 		}
 		/// <summary>
@@ -1667,8 +1680,16 @@ namespace LaserGRBL
 			if (dir == JogDirection.Zup)
 				stepList[2] = step_;
 			for (int i = 0; i < 3; i++) point[i] += stepList[i];
-			if (point[0] < SoftNegLimitPosi[0] || point[1] < SoftNegLimitPosi[1] || point[2] < SoftNegLimitPosi[2]) return false;
-			if (point[0] > SoftPosLimitPosi[0] || point[1] > SoftPosLimitPosi[1] || point[2] > SoftPosLimitPosi[2]) return false;
+			if (point[0] < SoftNegLimitPosi[0] || point[1] < SoftNegLimitPosi[1] || point[2] < SoftNegLimitPosi[2]) {
+				CheckLimitPosiFlag = true;
+				return false;
+			}	
+			if (point[0] > SoftPosLimitPosi[0] || point[1] > SoftPosLimitPosi[1] || point[2] > SoftPosLimitPosi[2])
+			{
+				CheckLimitPosiFlag = true;
+				return false;
+			}
+			CheckLimitPosiFlag = false;
 			return true;
 		}
 		/// <summary>

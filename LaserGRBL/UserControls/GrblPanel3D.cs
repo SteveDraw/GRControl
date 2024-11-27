@@ -17,25 +17,14 @@ namespace LaserGRBL.UserControls
     [ToolboxBitmap(typeof(SceneControl), "GrblScene")]
 	public partial class GrblPanel3D : UserControl, IGrblPanel
 	{
-		
+		#region GrblPanel3D字段
+		private double SquareRVal = 0;
 		// last mouse position
 		private Point? mLastMousePos = null;
 		// current mouse world position
         private Point? mMousePos = null;
-        // current mouse world position
-        private PointF? mMouseWorldPosition { get; set; }
-		// main camera
-		private OrthographicCamera mCamera { get; } = new OrthographicCamera();
-		private GLColor mBackgroundColor { get; set; }
-		private GLColor mTicksColor { get; set; }
-		private GLColor mMinorsColor { get; set; }
-		private GLColor mOriginsColor { get; set; }
-		private GLColor mPointerColor { get; set; }
-		private GLColor mTextColor { get; set; }
-        private GLColor mTextBoundingColor { get; set; }
-        // default font
-        private const string mFontName = "Courier New";
-        private Font mTextFont { get; set; } = new Font(mFontName, 12);
+		// default font
+		private const string mFontName = "Courier New";
 		// background
 		private Grid3D mGrid = null;
 		// grbl object
@@ -43,8 +32,8 @@ namespace LaserGRBL.UserControls
 		private Grbl3D mGrbl3DOff = null;
 		private object mGrbl3DLock = new object();
 		private string mMessage = null;
-        // reload request
-        private bool mReload = false;
+		// reload request
+		private bool mReload = false;
 		// invalidate all request
 		private bool mInvalidateAll = false;
 		// viewport padding
@@ -74,6 +63,30 @@ namespace LaserGRBL.UserControls
 		private static Exception FatalException;
 
 		private bool mShowCursor = true;
+		// 0 = never run, 1 = init begin, 2 = create complete, 3 = init complete, 4 = draw begin, 5 = draw end, > 5 = running (can be tested with a timer to check if it stop incrementing)
+		private static ulong OpCounter;
+
+		public static string CurrentVendor = "";
+		public static string CurrentRenderer = "";
+		public static string CurrentGLVersion = "";
+
+		private static string FirstGlError = null;
+		#endregion
+		#region GrblPanel3D属性
+		// current mouse world position
+		private PointF? mMouseWorldPosition { get; set; }
+		// main camera
+		private OrthographicCamera mCamera { get; } = new OrthographicCamera();
+		private GLColor mBackgroundColor { get; set; }
+		private GLColor mTicksColor { get; set; }
+		private GLColor mMinorsColor { get; set; }
+		private GLColor mOriginsColor { get; set; }
+		private GLColor mPointerColor { get; set; }
+		private GLColor mTextColor { get; set; }
+        private GLColor mTextBoundingColor { get; set; }
+        private Font mTextFont { get; set; } = new Font(mFontName, 12);
+        #endregion
+        
 		public bool ShowCursor
 		{
             get => mShowCursor;
@@ -94,14 +107,7 @@ namespace LaserGRBL.UserControls
             }
         }
 
-		// 0 = never run, 1 = init begin, 2 = create complete, 3 = init complete, 4 = draw begin, 5 = draw end, > 5 = running (can be tested with a timer to check if it stop incrementing)
-		private static ulong OpCounter;
-
-		public static string CurrentVendor = "";
-		public static string CurrentRenderer = "";
-		public static string CurrentGLVersion = "";
-
-		private static string FirstGlError = null;
+		
 
 		public static string GlDiagnosticMessage
 		{
@@ -272,132 +278,7 @@ namespace LaserGRBL.UserControls
 				ExceptionManager.OnHandledException(ex, true);
 			}
 		}
-		/// <summary>
-		/// 绘制主视图
-		/// </summary>
-		[System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
-		private void DrawScene()
-		{
-			try
-			{
-				if (FatalException != null) return;
-
-				OpCounter++;
-				Tools.SimpleCrono crono = new Tools.SimpleCrono(true);
-				OpenGL.MakeCurrent();
-				CheckError(OpenGL, "MakeCurrent");
-				OpenGL.SetDimensions(Width, Height);
-				OpenGL.Viewport(0, 0, Width, Height);
-				mCamera.Project(OpenGL);
-				CheckError(OpenGL, "Viewport");
-				OpenGL.ClearColor(mBackgroundColor.R, mBackgroundColor.G, mBackgroundColor.B, mBackgroundColor.A);
-				OpenGL.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
-				CheckError(OpenGL, "Clear");
-				// render grid
-				mGrid.ControlWidth = Width;
-				mGrid.TicksColor = mTicksColor;
-				mGrid.MinorsColor = mMinorsColor;
-				mGrid.OriginsColor = mOriginsColor;
-				mGrid.Render(OpenGL);
-				CheckError(OpenGL, "RenderGrid");
-				// enable anti alias
-				OpenGL.Enable(OpenGL.GL_BLEND);
-				OpenGL.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-				CheckError(OpenGL, "Blend");
-				OpenGL.Enable(OpenGL.GL_LINE_SMOOTH);
-				OpenGL.Hint(OpenGL.GL_LINE_SMOOTH_HINT, OpenGL.GL_NICEST);
-				CheckError(OpenGL, "Smooth");
-				// manage grbl object
-				if (mReload)
-				{
-					mReload = false;
-					Grbl3D oldGrbl3D = mGrbl3D;
-                    Grbl3D oldGrbl3DOff = mGrbl3DOff;
-                    lock (mGrbl3DLock)
-                    {
-                        mGrbl3D = null;
-                        mGrbl3DOff = null;
-					}
-					mMessage = Strings.ClearDrawing;
-					oldGrbl3D?.Dispose();
-                    oldGrbl3DOff?.Dispose();
-					mMessage = Strings.PrepareDrawing;
-                    Grbl3D newGrbl3D = new Grbl3D(Core, "LaserOn", false, ColorScheme.PreviewLaserPower, ColorScheme.PreviewBackColor, ColorScheme.PreviewJobRange);
-                    Grbl3D newGrbl3DOff = new Grbl3D(Core, "LaserOff", true, ColorScheme.PreviewOtherMovement, ColorScheme.PreviewBackColor, ColorScheme.PreviewJobRange);
-                    mMessage = null;
-                    lock (mGrbl3DLock)
-					{
-						mGrbl3D = newGrbl3D;
-						mGrbl3DOff = newGrbl3DOff;
-                    }
-                    mGrbl3DOff.LineWidth = 1;
-				}
-				if (mGrbl3D != null)
-				{
-					if (mInvalidateAll)
-					{
-						mInvalidateAll = false;
-						mGrbl3D.Color = ColorScheme.PreviewLaserPower;
-						mGrbl3D.BackgroundColor = ColorScheme.PreviewBackColor;
-                        mGrbl3D.BoundingBoxColor = ColorScheme.PreviewJobRange;
-                        mGrbl3D.InvalidateAll();
-						mGrbl3DOff.Color = ColorScheme.PreviewOtherMovement;
-                        mGrbl3DOff.BackgroundColor = ColorScheme.PreviewBackColor;
-                        mGrbl3DOff.InvalidateAll();
-					}
-					if (Core.ShowLaserOffMovements.Value)
-					{
-						mGrbl3DOff.Invalidate();
-						mGrbl3DOff.Render(OpenGL);
-					}
-					mGrbl3D.ShowBoundingBox = Core.ShowBoundingBox.Value;
-                    mGrbl3D.Invalidate();
-					mGrbl3D.Render(OpenGL);
-				}
-				CheckError(OpenGL, "RenderObject");
-				// disable anti alias
-				OpenGL.Disable(OpenGL.GL_BLEND);
-				OpenGL.Disable(OpenGL.GL_LINE_SMOOTH);
-				CheckError(OpenGL, "BlendDisable");
-				// 绘制十字交叉点
-				DrawPointer();
-				CheckError(OpenGL, "Pointer");
-				//绘制刻度尺
-				DrawRulers();
-				DrawSoftPosiLimit();
-				CheckError(OpenGL, "Rulers");
-				OpenGL.Flush();
-				CheckError(OpenGL, "Flush");
-				Bitmap newBmp = new Bitmap(Width, Height);
-				// clone opengl graphics
-				using (Graphics g = Graphics.FromImage(newBmp))
-				{
-					IntPtr handleDeviceContext = g.GetHdc();
-					OpenGL.Blit(handleDeviceContext);
-					CheckError(OpenGL, "Blit");
-					g.ReleaseHdc(handleDeviceContext);
-				}
-				mBmp.Bitmap = newBmp;
-
-				FrameTime.EnqueueNewSample(crono.ElapsedTime.TotalMilliseconds);
-
-				crono.Start();
-				Thread.Sleep(BestSleep(FrameTime.CurrentValue, 10, 100, 15, 50));
-				SleepTime.EnqueueNewSample(crono.ElapsedTime.TotalMilliseconds);
-
-				// call control invalidate
-				Invalidate();
-
-				OpCounter++;
-			}
-			catch (Exception ex)
-			{
-				Logger.LogException("OpenGL", ex);
-				FatalException = ex;
-				Invalidate();
-				ExceptionManager.OnHandledException(ex, true);
-			}
-		}
+		
 
 		private static int BestSleep(double renderTime, double minRender, double maxRender, double minSleep, double maxSleep)
 		{
@@ -438,51 +319,7 @@ namespace LaserGRBL.UserControls
 			RR.Set();
 		}
 
-		private void GrblPanel3D_Resize(object sender, EventArgs e)
-		{
-			// compute ratiobesed on last size
-			double wRatio = Width / mLastControlSize.X;
-			double hRatio = Height / mLastControlSize.Y;
-			// compute increment
-			double wIncrement = (mCamera.Right - mCamera.Left) - (mCamera.Right - mCamera.Left) * wRatio;
-            double hIncrement = (mCamera.Top - mCamera.Bottom) - (mCamera.Top - mCamera.Bottom) * hRatio;
-			double newLeft = mCamera.Left + wIncrement / 2;
-			double newRight = mCamera.Right - wIncrement / 2;
-			double newTop = mCamera.Top - hIncrement / 2;
-			double newBottom = mCamera.Bottom + hIncrement / 2;
-            double rw = 1;
-            double rh = 1;
-			double maxViewport = Grid3D.ViewportSize * 2;
-            if (newRight - newLeft > maxViewport)
-            {
-                rw = maxViewport / (newRight - newLeft);
-            }
-            if (newBottom - newTop > maxViewport)
-            {
-                rh = maxViewport / (newBottom - newTop);
-            }
-			double r = Math.Min(rw, rh);
-            newLeft = newLeft * r;
-            newRight = newRight * r;
-            newTop = newTop * r;
-            newBottom = newBottom * r;
-            // set world positions
-            SetWorldPosition(newLeft, newRight, newBottom, newTop);
-			// save last size
-			mLastControlSize = new PointF(Width, Height);
-		}
-		/// <summary>
-		/// 屏幕双击，位置响应
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void GrblPanel3D_DoubleClick(object sender, MouseEventArgs e)
-		{
-			if (Settings.GetObject("Click N Jog", true) && mMouseWorldPosition != null)
-			{
-				Core.JogToPosition((PointF)mMouseWorldPosition, e.Button == MouseButtons.Right);
-			}
-		}
+		
 
 		static uint errcounter = 0;
 		public static bool CheckError(OpenGL gl, string action)
@@ -542,7 +379,134 @@ namespace LaserGRBL.UserControls
 			Size size = TextRenderer.MeasureText(text, mTextFont);
             return new SizeF(size.Width * 0.8f, size.Height * 0.8f);
         }
+
 		#region 视图相关绘制事件
+		/// <summary>
+		/// 绘制主视图
+		/// </summary>
+		[System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
+		private void DrawScene()
+		{
+			try
+			{
+				if (FatalException != null) return;
+
+				OpCounter++;
+				Tools.SimpleCrono crono = new Tools.SimpleCrono(true);
+				OpenGL.MakeCurrent();
+				CheckError(OpenGL, "MakeCurrent");
+				OpenGL.SetDimensions(Width, Height);
+				OpenGL.Viewport(0, 0, Width, Height);
+				mCamera.Project(OpenGL);
+				CheckError(OpenGL, "Viewport");
+				OpenGL.ClearColor(mBackgroundColor.R, mBackgroundColor.G, mBackgroundColor.B, mBackgroundColor.A);
+				OpenGL.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
+				CheckError(OpenGL, "Clear");
+				// render grid
+				mGrid.ControlWidth = Width;
+				mGrid.TicksColor = mTicksColor;
+				mGrid.MinorsColor = mMinorsColor;
+				mGrid.OriginsColor = mOriginsColor;
+				mGrid.Render(OpenGL);
+				CheckError(OpenGL, "RenderGrid");
+				// enable anti alias
+				OpenGL.Enable(OpenGL.GL_BLEND);
+				OpenGL.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+				CheckError(OpenGL, "Blend");
+				OpenGL.Enable(OpenGL.GL_LINE_SMOOTH);
+				OpenGL.Hint(OpenGL.GL_LINE_SMOOTH_HINT, OpenGL.GL_NICEST);
+				CheckError(OpenGL, "Smooth");
+				// manage grbl object
+				if (mReload)
+				{
+					mReload = false;
+					Grbl3D oldGrbl3D = mGrbl3D;
+					Grbl3D oldGrbl3DOff = mGrbl3DOff;
+					lock (mGrbl3DLock)
+					{
+						mGrbl3D = null;
+						mGrbl3DOff = null;
+					}
+					mMessage = Strings.ClearDrawing;
+					oldGrbl3D?.Dispose();
+					oldGrbl3DOff?.Dispose();
+					mMessage = Strings.PrepareDrawing;
+					Grbl3D newGrbl3D = new Grbl3D(Core, "LaserOn", false, ColorScheme.PreviewLaserPower, ColorScheme.PreviewBackColor, ColorScheme.PreviewJobRange);
+					Grbl3D newGrbl3DOff = new Grbl3D(Core, "LaserOff", true, ColorScheme.PreviewOtherMovement, ColorScheme.PreviewBackColor, ColorScheme.PreviewJobRange);
+					mMessage = null;
+					lock (mGrbl3DLock)
+					{
+						mGrbl3D = newGrbl3D;
+						mGrbl3DOff = newGrbl3DOff;
+					}
+					mGrbl3DOff.LineWidth = 1;
+				}
+				if (mGrbl3D != null)
+				{
+					if (mInvalidateAll)
+					{
+						mInvalidateAll = false;
+						mGrbl3D.Color = ColorScheme.PreviewLaserPower;
+						mGrbl3D.BackgroundColor = ColorScheme.PreviewBackColor;
+						mGrbl3D.BoundingBoxColor = ColorScheme.PreviewJobRange;
+						mGrbl3D.InvalidateAll();
+						mGrbl3DOff.Color = ColorScheme.PreviewOtherMovement;
+						mGrbl3DOff.BackgroundColor = ColorScheme.PreviewBackColor;
+						mGrbl3DOff.InvalidateAll();
+					}
+					if (Core.ShowLaserOffMovements.Value)
+					{
+						mGrbl3DOff.Invalidate();
+						mGrbl3DOff.Render(OpenGL);
+					}
+					mGrbl3D.ShowBoundingBox = Core.ShowBoundingBox.Value;
+					mGrbl3D.Invalidate();
+					mGrbl3D.Render(OpenGL);
+				}
+				CheckError(OpenGL, "RenderObject");
+				// disable anti alias
+				OpenGL.Disable(OpenGL.GL_BLEND);
+				OpenGL.Disable(OpenGL.GL_LINE_SMOOTH);
+				CheckError(OpenGL, "BlendDisable");
+				// 绘制十字交叉点
+				DrawPointer();
+				CheckError(OpenGL, "Pointer");
+				//绘制刻度尺
+				DrawRulers();
+				DrawSoftPosiLimit();
+				CheckError(OpenGL, "Rulers");
+				OpenGL.Flush();
+				CheckError(OpenGL, "Flush");
+				Bitmap newBmp = new Bitmap(Width, Height);
+				// clone opengl graphics
+				using (Graphics g = Graphics.FromImage(newBmp))
+				{
+					IntPtr handleDeviceContext = g.GetHdc();
+					OpenGL.Blit(handleDeviceContext);
+					CheckError(OpenGL, "Blit");
+					g.ReleaseHdc(handleDeviceContext);
+				}
+				mBmp.Bitmap = newBmp;
+
+				FrameTime.EnqueueNewSample(crono.ElapsedTime.TotalMilliseconds);
+
+				crono.Start();
+				Thread.Sleep(BestSleep(FrameTime.CurrentValue, 10, 100, 15, 50));
+				SleepTime.EnqueueNewSample(crono.ElapsedTime.TotalMilliseconds);
+
+				// call control invalidate
+				Invalidate();
+
+				OpCounter++;
+			}
+			catch (Exception ex)
+			{
+				Logger.LogException("OpenGL", ex);
+				FatalException = ex;
+				Invalidate();
+				ExceptionManager.OnHandledException(ex, true);
+			}
+		}
 		/// <summary>
 		/// 软限位绘制事件
 		/// </summary>
@@ -708,9 +672,197 @@ namespace LaserGRBL.UserControls
 		{
 			OpenGL.DrawText((int)x, (int)y, color.R, color.G, color.B, mTextFont.FontFamily.Name, mTextFont.Size, text);
 		}
+		private void DrawException(PaintEventArgs e, string text)
+		{
+			try
+			{
+				using (Font font = new Font(mFontName, 12))
+				{
+					Size size = MeasureText(text, mTextFont);
+					Size size2 = new Size(size.Width + 20, size.Height);
+					Point point = new Point((Width - size2.Width) / 2, (Height - size2.Height) / 2);
+					DrawOverlay(e, point, size2, Color.Red, 100);
+					e.Graphics.DrawString(text, font, Brushes.White, point.X, point.Y);
+				}
+			}
+			catch { }
+		}
+		/// <summary>
+		/// 视图坐标和标签文本
+		/// </summary>
+		/// <param name="e"></param>
+		private void DoGDIDraw(PaintEventArgs e)
+		{
+			if (Core == null) return;
+			const int top = 12;
+			using (Brush b = new SolidBrush(ColorScheme.PreviewText))
+			using (Font font = new Font(mFontName, 10))
+			{
+				// set aliasing
+				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+				// use z
+				bool useZ = mLastWPos.Z != 0 || mLastMPos.Z != 0 || forcez;
+				string text = "				   X          Y";
+				if (!useZ) text += "          Z    ";
+				// last position
+				text += $"\n实际机台坐标(mm):      {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
+				if (!useZ) text += $" {FormatCoord(mLastMPos.Z)}";
+				// working offset
+				if (Core.WorkingOffset != GPoint.Zero)
+				{
+					text += $"\nWCO {FormatCoord(mLastWPos.X)} {FormatCoord(mLastWPos.Y)}";
+					if (useZ) text += $" {FormatCoord(mLastWPos.Z)}";
+				}
+				// mouse info
+				if (mMouseWorldPosition != null)
+				{
+					PointF pos = (PointF)mMouseWorldPosition;
+					text += $"\n当前鼠标位置坐标(mm):   {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
+					if (useZ) text += "          ";
+				}
+				text += $"\n进给速率和主轴速度(mm/s):{FormatCoord(mCurF)} {FormatCoord(mCurS)}";
+				text += $"\n方阻测量值:              {FormatCoord(Convert.ToInt32(SquareRVal))}	欧姆/平方";
+				if (Core.CheckLimitPosiFlag) text += $"\n目标位置超限位，请在限位区域操作！";
+				Size size = MeasureText(text, font);
+				Point point = new Point(Width - size.Width - mPadding.Right, top);
+				DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
+				e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+				e.Graphics.DrawString(text, font, b, point.X, point.Y);
+
+				// 这段是单独给进给速率和主轴速度可视化的，已经融合到里面了
+				if (mCurF != 0 || mCurS != 0 || mFSTrig)
+				{
+					//mFSTrig = true;
+					//int pos = point.Y + size.Height + 5;
+					//text = $"F {string.Format("{0,6:####0.##}", mCurF)}\nS {string.Format("{0,6:##0.##}", mCurS)}";
+					//size = MeasureText(text, font);
+					//point = new Point(Width - size.Width - mPadding.Right, pos);
+					//DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
+					//e.Graphics.DrawString(text, font, b, point.X, point.Y);
+				}
+
+				// performance
+				if (Core.ShowPerformanceDiagnostic.Value)
+				{
+					int pos = point.Y + size.Height + 5;
+
+					string VertexString = null;
+					ulong VertexCounter = 0;
+					lock (mGrbl3DLock)
+					{ VertexCounter = mGrbl3D != null ? mGrbl3D.VertexCounter : 0; }
+
+					if (VertexCounter < 1000)
+						VertexString = string.Format("{0,6:##0}", VertexCounter);
+					else if (VertexCounter < 1000000)
+						VertexString = string.Format("{0,6:###0.0} K", VertexCounter / 1000.0);
+					else if (VertexCounter < 1000000000)
+						VertexString = string.Format("{0,6:###0.0} M", VertexCounter / 1000000.0);
+					else
+						VertexString = string.Format("{0,6:###0.0} B", VertexCounter / 1000000000.0);
+
+					text = $"VER   {VertexString}\nAFT   {string.Format("{0,6:##0} ms", FrameTime.Avg)}\nAST   {string.Format("{0,6:##0} ms", SleepTime.Avg)}\nRPS   {string.Format("{0,6:##0}", Math.Max(0, Math.Floor(1000.0 / RefreshRate.Avg - 1)))}";
+					size = MeasureText(text, font);
+					point = new Point(Width - size.Width - mPadding.Right, pos);
+					DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
+					e.Graphics.DrawString(text, font, b, point.X, point.Y);
+				}
+
+				// loading
+				lock (mGrbl3DLock)
+				{
+					if (mMessage != null || mGrbl3D != null && mGrbl3D.LoadingPercentage < 100 || Core.ShowLaserOffMovements.Value && mGrbl3DOff != null && mGrbl3DOff.LoadingPercentage < 100)
+					{
+						int pos = point.Y + size.Height + 5;
+						double? perc;
+						perc = mGrbl3D?.LoadingPercentage ?? 0;
+						perc += mGrbl3DOff?.LoadingPercentage ?? 0;
+						if (Core.ShowLaserOffMovements.Value) perc /= 2;
+						text = mMessage == null ? $"{Strings.Loading} {perc:0.0}%" : mMessage;
+						size = MeasureText(text, font);
+						point = new Point(Width - size.Width - mPadding.Right, pos);
+						DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
+						e.Graphics.DrawString(text, font, b, point.X, point.Y);
+					}
+				}
+				//显示视图右下角标签文本
+				if (mGrbl3D == null)
+				{
+					text = $"{Strings.TipsBasicUsage}\r\n{Strings.TipsZoom}\r\n{Strings.TipsPan}\r\n{Strings.TipsJog}\r\n\r\n";
+					string shortcut = "";
+					string a_asd = GetShortcut(HotKeysManager.HotKey.Actions.AutoSizeDrawing);
+					string a_zin = GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing);
+					string a_zou = GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing);
+					if (!string.IsNullOrEmpty(a_asd)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.AutoSizeDrawing)}: {Strings.TipsZoomAuto}\r\n";
+					//暂时不需要这个热键，也不起作用
+					//if (!string.IsNullOrEmpty(a_zin)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing)}: {Strings.TipsZoomIn}\r\n";
+					//if (!string.IsNullOrEmpty(a_zou)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.ZoomOutDrawing)}: {Strings.TipsZoomOut}\r\n";
+					if (!string.IsNullOrEmpty(shortcut))
+						text = text + $"{Strings.TipsKeyboardShortcuts}\r\n" + shortcut;
+					text = text.Trim("\r\n".ToCharArray());
+					size = MeasureText(text, font);
+					point = new Point(Width - size.Width - mPadding.Right, Height - size.Height - 35);
+					DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 60);
+					e.Graphics.DrawString(text, font, b, point.X, point.Y);
+				}
+
+				if (Core.CrossCursor.Value &&
+					mMousePos != null &&
+					mMousePos.Value.X >= mPadding.Left &&
+					mMousePos.Value.X <= Width - mPadding.Right &&
+					mMousePos.Value.Y >= mPadding.Top &&
+					mMousePos.Value.Y <= Height - mPadding.Bottom)
+				{
+					Color loShadowColor = Color.FromArgb(
+						128,
+						ColorScheme.PreviewBackColor.R,
+						ColorScheme.PreviewBackColor.G,
+						ColorScheme.PreviewBackColor.B
+					);
+					using (Pen pCross = new Pen(loShadowColor))
+					{
+						DrawCross(e.Graphics, pCross, new Point(mMousePos.Value.X + 1, mMousePos.Value.Y + 1));
+					}
+					using (Pen pCross = new Pen(ColorScheme.PreviewCrossCursor))
+					{
+						DrawCross(e.Graphics, pCross, mMousePos.Value);
+						ShowCursor = false;
+					}
+				}
+				else
+				{
+					ShowCursor = true;
+				}
+
+			}
+		}
+		/// <summary>
+		/// 右下角标签文本框
+		/// </summary>
+		/// <param name="e"></param>
+		/// <param name="point"></param>
+		/// <param name="size"></param>
+		/// <param name="color"></param>
+		/// <param name="alfa"></param>
+		private void DrawOverlay(PaintEventArgs e, Point point, Size size, Color color, int alfa)
+		{
+			Color c = Color.FromArgb(alfa, color);
+			using (Brush brush = new SolidBrush(c))
+			using (GraphicsPath path = Tools.Graph.RoundedRect(new Rectangle(point.X - 5, point.Y - 5, size.Width, size.Height), 7))
+			{
+				e.Graphics.FillPath(brush, path);
+			}
+		}
+
+		private void DrawCross(Graphics g, Pen pCross, Point point)
+		{
+			const int halfCrossSize = 4;
+			g.DrawLine(pCross, new Point(mPadding.Left, point.Y), new Point(point.X - 5, point.Y));
+			g.DrawLine(pCross, new Point(point.X + halfCrossSize, point.Y), new Point(Width - mPadding.Right, point.Y));
+			g.DrawLine(pCross, new Point(point.X, mPadding.Top), new Point(point.X, point.Y - halfCrossSize));
+			g.DrawLine(pCross, new Point(point.X, point.Y + halfCrossSize), new Point(point.X, Height - mPadding.Bottom));
+			g.DrawRectangle(pCross, point.X - halfCrossSize, point.Y - halfCrossSize, halfCrossSize * 2, halfCrossSize * 2);
+		}
 		#endregion
-
-
 
 		Tools.SimpleCrono FpsCrono;
 		protected override void OnPaint(PaintEventArgs e)
@@ -753,27 +905,14 @@ namespace LaserGRBL.UserControls
 				;
 		}
 
-		private void DrawException(PaintEventArgs e, string text)
-		{
-			try
-			{
-				using (Font font = new Font(mFontName, 12))
-				{
-					Size size = MeasureText(text, mTextFont);
-					Size size2 = new Size(size.Width + 20, size.Height);
-					Point point = new Point((Width - size2.Width) / 2, (Height - size2.Height) / 2);
-					DrawOverlay(e, point, size2, Color.Red, 100);
-					e.Graphics.DrawString(text, font, Brushes.White, point.X, point.Y);
-				}
-			}
-			catch { }
-		}
-		/// <summary>
-		/// 文字格式转换
-		/// </summary>
-		/// <param name="coord"></param>
-		/// <returns></returns>
-		private string FormatCoord(float coord)
+		
+        #region 辅助函数
+        /// <summary>
+        /// 文字格式转换
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <returns></returns>
+        private string FormatCoord(float coord)
 		{
 			return string.Format("{0,10:######0.000}", coord);
 		}
@@ -793,163 +932,8 @@ namespace LaserGRBL.UserControls
 		public float ValMinuteToSecond(float val_) {
 			return val_ / 60;
 		}
-		/// <summary>
-		/// 视图坐标和标签文本
-		/// </summary>
-		/// <param name="e"></param>
-		private void DoGDIDraw(PaintEventArgs e)
-		{
-			if (Core == null) return;
-			const int top = 12;
-			using (Brush b = new SolidBrush(ColorScheme.PreviewText))
-			using (Font font = new Font(mFontName, 10))
-			{
-				// set aliasing
-				e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-				// use z
-				bool useZ = mLastWPos.Z != 0 || mLastMPos.Z != 0 || forcez;
-				string text = "                   X          Y";
-				if (!useZ) text += "          Z    ";
-				// last position
-				text += $"\n实际机台坐标(mm): {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
-				if (!useZ) text += $" {FormatCoord(mLastMPos.Z)}";
-				// working offset
-				if (Core.WorkingOffset != GPoint.Zero)
-				{
-					text += $"\nWCO {FormatCoord(mLastWPos.X)} {FormatCoord(mLastWPos.Y)}";
-					if (useZ) text += $" {FormatCoord(mLastWPos.Z)}";
-				}
-				// mouse info
-				if (mMouseWorldPosition != null)
-				{
-					PointF pos = (PointF)mMouseWorldPosition;
-					text += $"\n当前鼠标位置坐标(mm): {FormatCoord(pos.X)} {FormatCoord(pos.Y)}";
-					if (useZ) text += "          ";
-				}
-				
-				text += $"\n进给速率和主轴速度(mm/s): {FormatCoord(mCurF)} {FormatCoord(mCurS)}";
-				Size size = MeasureText(text, font);
-				Point point = new Point(Width - size.Width - mPadding.Right, top);
-				DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
-				e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-				e.Graphics.DrawString(text, font, b, point.X, point.Y);
-
-				// laser info
-				if (mCurF != 0 || mCurS != 0 || mFSTrig)
-				{
-					mFSTrig = true;
-					int pos = point.Y + size.Height + 5;
-					text = $"F {string.Format("{0,6:####0.##}", mCurF)}\nS {string.Format("{0,6:##0.##}", mCurS)}";
-					size = MeasureText(text, font);
-					point = new Point(Width - size.Width - mPadding.Right, pos);
-					DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
-					e.Graphics.DrawString(text, font, b, point.X, point.Y);
-				}
-
-				// performance
-				if (Core.ShowPerformanceDiagnostic.Value)
-				{
-					int pos = point.Y + size.Height + 5;
-
-					string VertexString = null;
-					ulong VertexCounter = 0;
-					lock (mGrbl3DLock)
-					{VertexCounter = mGrbl3D != null ? mGrbl3D.VertexCounter : 0;}
-
-					if (VertexCounter < 1000)
-						VertexString = string.Format("{0,6:##0}", VertexCounter);
-					else if (VertexCounter < 1000000)
-						VertexString = string.Format("{0,6:###0.0} K", VertexCounter / 1000.0);
-					else if (VertexCounter < 1000000000)
-						VertexString = string.Format("{0,6:###0.0} M", VertexCounter / 1000000.0);
-					else
-						VertexString = string.Format("{0,6:###0.0} B", VertexCounter / 1000000000.0);
-
-					text = $"VER   {VertexString}\nAFT   {string.Format("{0,6:##0} ms", FrameTime.Avg)}\nAST   {string.Format("{0,6:##0} ms", SleepTime.Avg)}\nRPS   {string.Format("{0,6:##0}", Math.Max(0, Math.Floor(1000.0 / RefreshRate.Avg - 1)))}";
-					size = MeasureText(text, font);
-					point = new Point(Width - size.Width - mPadding.Right, pos);
-					DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
-					e.Graphics.DrawString(text, font, b, point.X, point.Y);
-                }
-
-                // loading
-                lock (mGrbl3DLock)
-                {
-                    if (mMessage != null || mGrbl3D != null && mGrbl3D.LoadingPercentage < 100 || Core.ShowLaserOffMovements.Value && mGrbl3DOff != null && mGrbl3DOff.LoadingPercentage < 100)
-                    {
-                        int pos = point.Y + size.Height + 5;
-                        double? perc;
-                        perc = mGrbl3D?.LoadingPercentage ?? 0;
-                        perc += mGrbl3DOff?.LoadingPercentage ?? 0;
-                        if (Core.ShowLaserOffMovements.Value) perc /= 2;
-                        text = mMessage == null ? $"{Strings.Loading} {perc:0.0}%" : mMessage;
-                        size = MeasureText(text, font);
-                        point = new Point(Width - size.Width - mPadding.Right, pos);
-                        DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 100);
-                        e.Graphics.DrawString(text, font, b, point.X, point.Y);
-                    }
-                }
-				//显示视图右下角标签文本
-                if (mGrbl3D == null)
-				{
-					text = $"{Strings.TipsBasicUsage}\r\n{Strings.TipsZoom}\r\n{Strings.TipsPan}\r\n{Strings.TipsJog}\r\n\r\n";
-                    string shortcut = "";
-					string a_asd = GetShortcut(HotKeysManager.HotKey.Actions.AutoSizeDrawing);
-					string a_zin = GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing);
-					string a_zou = GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing);
-					if (!string.IsNullOrEmpty(a_asd)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.AutoSizeDrawing)}: {Strings.TipsZoomAuto}\r\n";
-					if (!string.IsNullOrEmpty(a_zin)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.ZoomInDrawing)}: {Strings.TipsZoomIn}\r\n";
-					if (!string.IsNullOrEmpty(a_zou)) shortcut += $"{GetShortcut(HotKeysManager.HotKey.Actions.ZoomOutDrawing)}: {Strings.TipsZoomOut}\r\n";
-					if (!string.IsNullOrEmpty(shortcut))
-						text = text + $"{Strings.TipsKeyboardShortcuts}\r\n" + shortcut;
-                    text = text.Trim("\r\n".ToCharArray());
-                    size = MeasureText(text, font);
-					point = new Point(Width - size.Width - mPadding.Right, Height - size.Height - 35);
-					DrawOverlay(e, point, size, ColorScheme.PreviewRuler, 60);
-					e.Graphics.DrawString(text, font, b, point.X, point.Y);
-				}
-
-				if (Core.CrossCursor.Value &&
-					mMousePos != null &&
-					mMousePos.Value.X >= mPadding.Left &&
-					mMousePos.Value.X <= Width - mPadding.Right &&
-					mMousePos.Value.Y >= mPadding.Top &&
-					mMousePos.Value.Y <= Height - mPadding.Bottom)
-                {
-					Color loShadowColor = Color.FromArgb(
-						128,
-						ColorScheme.PreviewBackColor.R,
-                        ColorScheme.PreviewBackColor.G,
-                        ColorScheme.PreviewBackColor.B
-                    );
-                    using (Pen pCross = new Pen(loShadowColor))
-                    {
-                        DrawCross(e.Graphics, pCross, new Point(mMousePos.Value.X + 1, mMousePos.Value.Y + 1));
-                    }
-                    using (Pen pCross = new Pen(ColorScheme.PreviewCrossCursor))
-                    {
-						DrawCross(e.Graphics, pCross, mMousePos.Value);
-                        ShowCursor = false;
-                    }
-                }
-				else
-				{
-					ShowCursor = true;
-				}
-
-			}
-		}
-
-		private void DrawCross(Graphics g, Pen pCross, Point point)
-        {
-            const int halfCrossSize = 4;
-            g.DrawLine(pCross, new Point(mPadding.Left, point.Y), new Point(point.X - 5, point.Y));
-            g.DrawLine(pCross, new Point(point.X + halfCrossSize, point.Y), new Point(Width - mPadding.Right, point.Y));
-            g.DrawLine(pCross, new Point(point.X, mPadding.Top), new Point(point.X, point.Y - halfCrossSize));
-            g.DrawLine(pCross, new Point(point.X, point.Y + halfCrossSize), new Point(point.X, Height - mPadding.Bottom));
-            g.DrawRectangle(pCross, point.X - halfCrossSize, point.Y - halfCrossSize, halfCrossSize * 2, halfCrossSize * 2);
-        }
-
+        #endregion
+        
 		private string GetShortcut(HotKeysManager.HotKey.Actions action)
 		{
 			string shortcut = Core.GetHotKeyString(action);
@@ -961,23 +945,7 @@ namespace LaserGRBL.UserControls
 			}
 			return shortcut;
 		}
-		/// <summary>
-		/// 右下角标签文本框
-		/// </summary>
-		/// <param name="e"></param>
-		/// <param name="point"></param>
-		/// <param name="size"></param>
-		/// <param name="color"></param>
-		/// <param name="alfa"></param>
-		private void DrawOverlay(PaintEventArgs e, Point point, Size size, Color color, int alfa)
-		{
-            Color c = Color.FromArgb(alfa, color);
-            using (Brush brush = new SolidBrush(c))
-            using (GraphicsPath path = Tools.Graph.RoundedRect(new Rectangle(point.X - 5, point.Y - 5, size.Width, size.Height), 7))
-            {
-                e.Graphics.FillPath(brush, path);
-            }
-        }
+		
 		/// <summary>
 		/// 测量右下角文本框高宽高
 		/// </summary>
@@ -991,7 +959,52 @@ namespace LaserGRBL.UserControls
 			size.Height += 5;
 			return size;
 		}
-
+		#region 鼠标窗口事件
+		private void GrblPanel3D_Resize(object sender, EventArgs e)
+		{
+			// compute ratiobesed on last size
+			double wRatio = Width / mLastControlSize.X;
+			double hRatio = Height / mLastControlSize.Y;
+			// compute increment
+			double wIncrement = (mCamera.Right - mCamera.Left) - (mCamera.Right - mCamera.Left) * wRatio;
+			double hIncrement = (mCamera.Top - mCamera.Bottom) - (mCamera.Top - mCamera.Bottom) * hRatio;
+			double newLeft = mCamera.Left + wIncrement / 2;
+			double newRight = mCamera.Right - wIncrement / 2;
+			double newTop = mCamera.Top - hIncrement / 2;
+			double newBottom = mCamera.Bottom + hIncrement / 2;
+			double rw = 1;
+			double rh = 1;
+			double maxViewport = Grid3D.ViewportSize * 2;
+			if (newRight - newLeft > maxViewport)
+			{
+				rw = maxViewport / (newRight - newLeft);
+			}
+			if (newBottom - newTop > maxViewport)
+			{
+				rh = maxViewport / (newBottom - newTop);
+			}
+			double r = Math.Min(rw, rh);
+			newLeft = newLeft * r;
+			newRight = newRight * r;
+			newTop = newTop * r;
+			newBottom = newBottom * r;
+			// set world positions
+			SetWorldPosition(newLeft, newRight, newBottom, newTop);
+			// save last size
+			mLastControlSize = new PointF(Width, Height);
+		}
+		/// <summary>
+		/// 屏幕双击，位置响应
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void GrblPanel3D_DoubleClick(object sender, MouseEventArgs e)
+		{
+			if (Settings.GetObject("Click N Jog", true) && mMouseWorldPosition != null)
+			{
+				Core.JogToPosition((PointF)mMouseWorldPosition, e.Button == MouseButtons.Right);
+			}
+		}
 		private void GrblSceneControl_MouseLeave(object sender, EventArgs e)
 		{
 			mLastMousePos = null;
@@ -1053,8 +1066,8 @@ namespace LaserGRBL.UserControls
 				);
 			}
 		}
-
-		public void SetCore(GrblCore core)
+        #endregion
+        public void SetCore(GrblCore core)
 		{
 			Core = core;
             Core.OnFileLoading += OnFileLoading;

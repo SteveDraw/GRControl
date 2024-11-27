@@ -38,7 +38,11 @@ namespace LaserGRBL
 			ColorScheme.CurrentScheme = Settings.GetObject("Color Schema", Scheme.CADDark);
 
 			InitializeComponent();
-			ExceptionManager.ParentMain = this;
+			#region 窗口初始化设置
+			//this.StartPosition = FormStartPosition.CenterScreen;
+			//this.WindowState = FormWindowState.Maximized;
+			#endregion
+            ExceptionManager.ParentMain = this;
 
 			mLineWidthMenu = new List<ToolStripMenuItem>()
 			{
@@ -129,6 +133,7 @@ namespace LaserGRBL
 		public MainForm(string[] args) : this()
 		{
 			this.args = args;
+			this.WindowState = FormWindowState.Maximized;
 		}
 
 		private void MnAutoUpdateDropDown_Closing(object sender, ToolStripDropDownClosingEventArgs e)
