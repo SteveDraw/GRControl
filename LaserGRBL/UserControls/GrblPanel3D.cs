@@ -141,7 +141,7 @@ namespace LaserGRBL.UserControls
 			RefreshRate = new Base.Mathematics.MobileDAverageCalculator(3);
 			mLastWPos = GPoint.Zero;
 			mLastMPos = GPoint.Zero;
-			forcez = Settings.GetObject("Enale Z Jog Control", false);
+			forcez = Settings.GetObject("Enale Z Jog Control", true);
 			MouseDoubleClick += GrblPanel3D_DoubleClick;
 			SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			SetStyle(ControlStyles.UserPaint, true);
@@ -703,10 +703,10 @@ namespace LaserGRBL.UserControls
 				// use z
 				bool useZ = mLastWPos.Z != 0 || mLastMPos.Z != 0 || forcez;
 				string text = "				   X          Y";
-				if (!useZ) text += "          Z    ";
+				if (useZ) text += "          Z    ";
 				// last position
 				text += $"\n实际机台坐标(mm):      {FormatCoord(mLastMPos.X)} {FormatCoord(mLastMPos.Y)}";
-				if (!useZ) text += $" {FormatCoord(mLastMPos.Z)}";
+				if (useZ) text += $" {FormatCoord(mLastMPos.Z)}";
 				// working offset
 				if (Core.WorkingOffset != GPoint.Zero)
 				{

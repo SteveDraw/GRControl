@@ -121,32 +121,6 @@
     <value>194, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="StatusBar.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 1270</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="StatusBar.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 0, 28, 0</value>
-  </data>
-  <data name="StatusBar.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1736, 36</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="StatusBar.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;StatusBar.Name" xml:space="preserve">
-    <value>StatusBar</value>
-  </data>
-  <data name="&gt;&gt;StatusBar.Type" xml:space="preserve">
-    <value>System.Windows.Forms.StatusStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;StatusBar.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;StatusBar.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="TTLLines.Size" type="System.Drawing.Size, System.Drawing">
     <value>57, 29</value>
   </data>
@@ -168,6 +142,7 @@
   <data name="PbBuffer.Size" type="System.Drawing.Size, System.Drawing">
     <value>105, 30</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="BtnUnlockFromStuck.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -269,39 +244,37 @@
   <data name="TTTStatus.Text" xml:space="preserve">
     <value>Disconnected</value>
   </data>
+  <data name="StatusBar.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 1270</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="StatusBar.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 0, 28, 0</value>
+  </data>
+  <data name="StatusBar.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1736, 36</value>
+  </data>
+  <data name="StatusBar.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;StatusBar.Name" xml:space="preserve">
+    <value>StatusBar</value>
+  </data>
+  <data name="&gt;&gt;StatusBar.Type" xml:space="preserve">
+    <value>System.Windows.Forms.StatusStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;StatusBar.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;StatusBar.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <metadata name="UpdateTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>295, 17</value>
   </metadata>
   <metadata name="MMn.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>118, 17</value>
   </metadata>
-  <data name="MMn.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="MMn.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1736, 32</value>
-  </data>
-  <data name="MMn.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;MMn.Name" xml:space="preserve">
-    <value>MMn</value>
-  </data>
-  <data name="&gt;&gt;MMn.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;MMn.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;MMn.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="MnGrbl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>63, 28</value>
-  </data>
-  <data name="MnGrbl.Text" xml:space="preserve">
-    <value>&amp;Grbl</value>
-  </data>
   <data name="MnConnect.Size" type="System.Drawing.Size, System.Drawing">
     <value>271, 34</value>
   </data>
@@ -389,11 +362,11 @@
   <data name="MnExit.Text" xml:space="preserve">
     <value>&amp;Exit</value>
   </data>
-  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 28</value>
+  <data name="MnGrbl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>63, 28</value>
   </data>
-  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;File</value>
+  <data name="MnGrbl.Text" xml:space="preserve">
+    <value>&amp;Grbl</value>
   </data>
   <data name="MnFileOpen.Size" type="System.Drawing.Size, System.Drawing">
     <value>340, 34</value>
@@ -482,11 +455,11 @@
   <data name="MnRunMulti.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <data name="MnGenerate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>104, 28</value>
+  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>56, 28</value>
   </data>
-  <data name="MnGenerate.Text" xml:space="preserve">
-    <value>Generate</value>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;File</value>
   </data>
   <data name="MnPowerVsSpeed.Size" type="System.Drawing.Size, System.Drawing">
     <value>281, 34</value>
@@ -512,11 +485,11 @@
   <data name="shakeTestToolStripMenuItem.Text" xml:space="preserve">
     <value>Shake Test</value>
   </data>
-  <data name="MNEsp8266.Size" type="System.Drawing.Size, System.Drawing">
-    <value>101, 28</value>
+  <data name="MnGenerate.Size" type="System.Drawing.Size, System.Drawing">
+    <value>104, 28</value>
   </data>
-  <data name="MNEsp8266.Text" xml:space="preserve">
-    <value>&amp;ESP8266</value>
+  <data name="MnGenerate.Text" xml:space="preserve">
+    <value>Generate</value>
   </data>
   <data name="MNGrblEmulator.Size" type="System.Drawing.Size, System.Drawing">
     <value>230, 34</value>
@@ -524,11 +497,11 @@
   <data name="MNGrblEmulator.Text" xml:space="preserve">
     <value>&amp;Grbl Emulator</value>
   </data>
-  <data name="schemaToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>80, 28</value>
+  <data name="MNEsp8266.Size" type="System.Drawing.Size, System.Drawing">
+    <value>101, 28</value>
   </data>
-  <data name="schemaToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Colors</value>
+  <data name="MNEsp8266.Text" xml:space="preserve">
+    <value>&amp;ESP8266</value>
   </data>
   <data name="cadStyleToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>196, 34</value>
@@ -572,11 +545,11 @@
   <data name="nightyToolStripMenuItem.Text" xml:space="preserve">
     <value>Nighty</value>
   </data>
-  <data name="previewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>92, 28</value>
+  <data name="schemaToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 28</value>
   </data>
-  <data name="previewToolStripMenuItem.Text" xml:space="preserve">
-    <value>Preview</value>
+  <data name="schemaToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Colors</value>
   </data>
   <data name="autoSizeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>342, 34</value>
@@ -623,12 +596,6 @@
   <data name="crossCursorToolStripMenuItem.Text" xml:space="preserve">
     <value>Show cross cursor</value>
   </data>
-  <data name="autosizeModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>342, 34</value>
-  </data>
-  <data name="autosizeModeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Auto size mode</value>
-  </data>
   <data name="drawingAreaToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>225, 34</value>
   </data>
@@ -641,11 +608,11 @@
   <data name="movingAreaToolStripMenuItem.Text" xml:space="preserve">
     <value>Moving area</value>
   </data>
-  <data name="lineSizeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="autosizeModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>342, 34</value>
   </data>
-  <data name="lineSizeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Line size</value>
+  <data name="autosizeModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Auto size mode</value>
   </data>
   <data name="pxToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
     <value>142, 34</value>
@@ -677,6 +644,12 @@
   <data name="pxToolStripMenuItem5.Text" xml:space="preserve">
     <value>5px</value>
   </data>
+  <data name="lineSizeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>342, 34</value>
+  </data>
+  <data name="lineSizeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Line size</value>
+  </data>
   <data name="toolStripMenuItem9.Size" type="System.Drawing.Size, System.Drawing">
     <value>339, 6</value>
   </data>
@@ -686,11 +659,11 @@
   <data name="showDiagnosticDataToolStripMenuItem.Text" xml:space="preserve">
     <value>Show diagnostic data</value>
   </data>
-  <data name="linguaToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>111, 28</value>
+  <data name="previewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>92, 28</value>
   </data>
-  <data name="linguaToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Language</value>
+  <data name="previewToolStripMenuItem.Text" xml:space="preserve">
+    <value>Preview</value>
   </data>
   <data name="MNEnglish.Size" type="System.Drawing.Size, System.Drawing">
     <value>284, 34</value>
@@ -812,11 +785,11 @@
   <data name="japaneseToolStripMenuItem.Text" xml:space="preserve">
     <value>Japanese</value>
   </data>
-  <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>71, 28</value>
+  <data name="linguaToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>111, 28</value>
   </data>
-  <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Tools</value>
+  <data name="linguaToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Language</value>
   </data>
   <data name="installCH340DriverToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>295, 34</value>
@@ -845,14 +818,11 @@
   <data name="configurationWizardToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <data name="MnOrtur.Size" type="System.Drawing.Size, System.Drawing">
-    <value>73, 28</value>
+  <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>71, 28</value>
   </data>
-  <data name="MnOrtur.Text" xml:space="preserve">
-    <value>Ortur</value>
-  </data>
-  <data name="MnOrtur.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
+  <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Tools</value>
   </data>
   <data name="orturSupportGroupToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>358, 34</value>
@@ -908,14 +878,14 @@
   <data name="MnConfigureOrturWiFi.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <data name="questionMarkToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>16, 28</value>
+  <data name="MnOrtur.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 28</value>
   </data>
-  <data name="MnAutoUpdate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>299, 34</value>
+  <data name="MnOrtur.Text" xml:space="preserve">
+    <value>Ortur</value>
   </data>
-  <data name="MnAutoUpdate.Text" xml:space="preserve">
-    <value>Auto update</value>
+  <data name="MnOrtur.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="MnNotifyNewVersion.Size" type="System.Drawing.Size, System.Drawing">
     <value>296, 34</value>
@@ -943,6 +913,12 @@
   </data>
   <data name="MnCheckNow.Text" xml:space="preserve">
     <value>Check Now!</value>
+  </data>
+  <data name="MnAutoUpdate.Size" type="System.Drawing.Size, System.Drawing">
+    <value>299, 34</value>
+  </data>
+  <data name="MnAutoUpdate.Text" xml:space="preserve">
+    <value>Auto update</value>
   </data>
   <data name="toolStripMenuItem5.Size" type="System.Drawing.Size, System.Drawing">
     <value>296, 6</value>
@@ -994,6 +970,30 @@
   </data>
   <data name="licenseToolStripMenuItem.Text" xml:space="preserve">
     <value>License</value>
+  </data>
+  <data name="questionMarkToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>16, 28</value>
+  </data>
+  <data name="MMn.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="MMn.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1736, 32</value>
+  </data>
+  <data name="MMn.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;MMn.Name" xml:space="preserve">
+    <value>MMn</value>
+  </data>
+  <data name="&gt;&gt;MMn.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;MMn.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;MMn.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <metadata name="AwakeTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>415, 18</value>

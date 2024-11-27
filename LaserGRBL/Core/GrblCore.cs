@@ -410,10 +410,10 @@ namespace LaserGRBL
 			#region 限位初始化设置
 			SoftPosLimitPosi[0] = 285;
 			SoftPosLimitPosi[1] = 275;
-			SoftPosLimitPosi[2] = 0;
-			SoftNegLimitPosi[0] = 5;
-			SoftNegLimitPosi[1] = 0;
-			SoftNegLimitPosi[2] = 0;
+			SoftPosLimitPosi[2] = 1000;
+			SoftNegLimitPosi[0] = -5;
+			SoftNegLimitPosi[1] = -5;
+			SoftNegLimitPosi[2] = -1000;
 			#endregion
 		}
 

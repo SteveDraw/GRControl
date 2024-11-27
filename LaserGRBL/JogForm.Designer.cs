@@ -30,41 +30,41 @@
 		{
             this.components = new System.ComponentModel.Container();
             this.tlp = new System.Windows.Forms.TableLayoutPanel();
-            this.TlpSpeedControl = new System.Windows.Forms.TableLayoutPanel();
-            this.TbSpeed = new System.Windows.Forms.TrackBar();
-            this.LblSpeed = new System.Windows.Forms.Label();
-            this.TlpStepControl = new System.Windows.Forms.TableLayoutPanel();
-            this.LblStep = new System.Windows.Forms.Label();
-            this.TlpZControl = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.TT = new System.Windows.Forms.ToolTip(this.components);
-            this.UpdateFMax = new System.Windows.Forms.Timer(this.components);
             this.BtnHome = new LaserGRBL.DirectionButton();
             this.BtnW = new LaserGRBL.DirectionButton();
             this.BtnN = new LaserGRBL.DirectionButton();
             this.BtnE = new LaserGRBL.DirectionButton();
             this.BtnNW = new LaserGRBL.DirectionButton();
+            this.BtnNE = new LaserGRBL.DirectionButton();
             this.BtnS = new LaserGRBL.DirectionButton();
             this.BtnSW = new LaserGRBL.DirectionButton();
             this.BtnSE = new LaserGRBL.DirectionButton();
+            this.TlpSpeedControl = new System.Windows.Forms.TableLayoutPanel();
+            this.TbSpeed = new System.Windows.Forms.TrackBar();
+            this.LblSpeed = new System.Windows.Forms.Label();
+            this.TlpStepControl = new System.Windows.Forms.TableLayoutPanel();
             this.TbStep = new LaserGRBL.StepBar();
+            this.LblStep = new System.Windows.Forms.Label();
+            this.TlpZControl = new System.Windows.Forms.TableLayoutPanel();
             this.BtnZup01 = new LaserGRBL.DirectionStepButton();
             this.BtnZup1 = new LaserGRBL.DirectionStepButton();
             this.BtnZup10 = new LaserGRBL.DirectionStepButton();
             this.BtnZdown10 = new LaserGRBL.DirectionStepButton();
             this.BtnZdown1 = new LaserGRBL.DirectionStepButton();
             this.BtnZdown01 = new LaserGRBL.DirectionStepButton();
-            this.BtnNE = new LaserGRBL.DirectionButton();
+            this.TT = new System.Windows.Forms.ToolTip(this.components);
+            this.UpdateFMax = new System.Windows.Forms.Timer(this.components);
             this.tlp.SuspendLayout();
             this.TlpSpeedControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TbSpeed)).BeginInit();
             this.TlpStepControl.SuspendLayout();
-            this.TlpZControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TbStep)).BeginInit();
+            this.TlpZControl.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlp
             // 
+            this.tlp.AutoSize = true;
             this.tlp.ColumnCount = 8;
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
@@ -97,128 +97,6 @@
             this.tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp.Size = new System.Drawing.Size(267, 125);
             this.tlp.TabIndex = 0;
-            // 
-            // TlpSpeedControl
-            // 
-            this.TlpSpeedControl.AutoSize = true;
-            this.TlpSpeedControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.TlpSpeedControl.ColumnCount = 1;
-            this.TlpSpeedControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TlpSpeedControl.Controls.Add(this.TbSpeed, 0, 0);
-            this.TlpSpeedControl.Controls.Add(this.LblSpeed, 0, 1);
-            this.TlpSpeedControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TlpSpeedControl.Location = new System.Drawing.Point(-11, 0);
-            this.TlpSpeedControl.Margin = new System.Windows.Forms.Padding(0);
-            this.TlpSpeedControl.Name = "TlpSpeedControl";
-            this.TlpSpeedControl.RowCount = 2;
-            this.tlp.SetRowSpan(this.TlpSpeedControl, 3);
-            this.TlpSpeedControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TlpSpeedControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpSpeedControl.Size = new System.Drawing.Size(75, 126);
-            this.TlpSpeedControl.TabIndex = 18;
-            // 
-            // TbSpeed
-            // 
-            this.TbSpeed.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TbSpeed.LargeChange = 100;
-            this.TbSpeed.Location = new System.Drawing.Point(3, 3);
-            this.TbSpeed.Maximum = 4000;
-            this.TbSpeed.Minimum = 10;
-            this.TbSpeed.Name = "TbSpeed";
-            this.TbSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.TbSpeed.Size = new System.Drawing.Size(69, 100);
-            this.TbSpeed.SmallChange = 50;
-            this.TbSpeed.TabIndex = 16;
-            this.TbSpeed.TickFrequency = 200;
-            this.TbSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.TbSpeed.Value = 1000;
-            this.TbSpeed.ValueChanged += new System.EventHandler(this.TbSpeed_ValueChanged);
-            // 
-            // LblSpeed
-            // 
-            this.LblSpeed.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblSpeed.AutoSize = true;
-            this.LblSpeed.Location = new System.Drawing.Point(10, 106);
-            this.LblSpeed.Name = "LblSpeed";
-            this.LblSpeed.Size = new System.Drawing.Size(55, 20);
-            this.LblSpeed.TabIndex = 17;
-            this.LblSpeed.Text = "F1000";
-            // 
-            // TlpStepControl
-            // 
-            this.TlpStepControl.AutoSize = true;
-            this.TlpStepControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.TlpStepControl.ColumnCount = 1;
-            this.TlpStepControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TlpStepControl.Controls.Add(this.TbStep, 0, 0);
-            this.TlpStepControl.Controls.Add(this.LblStep, 0, 1);
-            this.TlpStepControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TlpStepControl.Location = new System.Drawing.Point(204, 0);
-            this.TlpStepControl.Margin = new System.Windows.Forms.Padding(0);
-            this.TlpStepControl.Name = "TlpStepControl";
-            this.TlpStepControl.RowCount = 2;
-            this.tlp.SetRowSpan(this.TlpStepControl, 3);
-            this.TlpStepControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TlpStepControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpStepControl.Size = new System.Drawing.Size(75, 126);
-            this.TlpStepControl.TabIndex = 19;
-            // 
-            // LblStep
-            // 
-            this.LblStep.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblStep.AutoSize = true;
-            this.LblStep.Location = new System.Drawing.Point(24, 106);
-            this.LblStep.Name = "LblStep";
-            this.LblStep.Size = new System.Drawing.Size(27, 20);
-            this.LblStep.TabIndex = 18;
-            this.LblStep.Text = "10";
-            // 
-            // TlpZControl
-            // 
-            this.TlpZControl.ColumnCount = 1;
-            this.TlpZControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TlpZControl.Controls.Add(this.BtnZup01, 0, 3);
-            this.TlpZControl.Controls.Add(this.BtnZup1, 0, 2);
-            this.TlpZControl.Controls.Add(this.BtnZup10, 0, 1);
-            this.TlpZControl.Controls.Add(this.BtnZdown10, 0, 6);
-            this.TlpZControl.Controls.Add(this.BtnZdown1, 0, 5);
-            this.TlpZControl.Controls.Add(this.BtnZdown01, 0, 5);
-            this.TlpZControl.Controls.Add(this.label1, 0, 4);
-            this.TlpZControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TlpZControl.Location = new System.Drawing.Point(184, 0);
-            this.TlpZControl.Margin = new System.Windows.Forms.Padding(0);
-            this.TlpZControl.Name = "TlpZControl";
-            this.TlpZControl.RowCount = 9;
-            this.tlp.SetRowSpan(this.TlpZControl, 3);
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TlpZControl.Size = new System.Drawing.Size(20, 126);
-            this.TlpZControl.TabIndex = 20;
-            this.TlpZControl.Visible = false;
-            // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1, 53);
-            this.label1.Margin = new System.Windows.Forms.Padding(0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(18, 20);
-            this.label1.TabIndex = 20;
-            this.label1.Text = "Z";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // UpdateFMax
-            // 
-            this.UpdateFMax.Interval = 1000;
-            this.UpdateFMax.Tick += new System.EventHandler(this.UpdateFMax_Tick);
             // 
             // BtnHome
             // 
@@ -325,6 +203,27 @@
             this.BtnNW.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseDown);
             this.BtnNW.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseUp);
             // 
+            // BtnNE
+            // 
+            this.BtnNE.AltImage = null;
+            this.BtnNE.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BtnNE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.BtnNE.Caption = null;
+            this.BtnNE.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnNE.Image = null;
+            this.BtnNE.JogDirection = LaserGRBL.GrblCore.JogDirection.NE;
+            this.BtnNE.Location = new System.Drawing.Point(147, 3);
+            this.BtnNE.MaximumSize = new System.Drawing.Size(48, 48);
+            this.BtnNE.Name = "BtnNE";
+            this.BtnNE.RoundedBorders = false;
+            this.BtnNE.Size = new System.Drawing.Size(33, 33);
+            this.BtnNE.SizingMode = LaserGRBL.UserControls.ImageButton.SizingModes.StretchImage;
+            this.BtnNE.TabIndex = 12;
+            this.BtnNE.TabStop = false;
+            this.BtnNE.UseAltImage = false;
+            this.BtnNE.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseDown);
+            this.BtnNE.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseUp);
+            // 
             // BtnS
             // 
             this.BtnS.AltImage = null;
@@ -388,6 +287,71 @@
             this.BtnSE.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseDown);
             this.BtnSE.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseUp);
             // 
+            // TlpSpeedControl
+            // 
+            this.TlpSpeedControl.AutoSize = true;
+            this.TlpSpeedControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.TlpSpeedControl.ColumnCount = 1;
+            this.TlpSpeedControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TlpSpeedControl.Controls.Add(this.TbSpeed, 0, 0);
+            this.TlpSpeedControl.Controls.Add(this.LblSpeed, 0, 1);
+            this.TlpSpeedControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TlpSpeedControl.Location = new System.Drawing.Point(-11, 0);
+            this.TlpSpeedControl.Margin = new System.Windows.Forms.Padding(0);
+            this.TlpSpeedControl.Name = "TlpSpeedControl";
+            this.TlpSpeedControl.RowCount = 2;
+            this.tlp.SetRowSpan(this.TlpSpeedControl, 3);
+            this.TlpSpeedControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TlpSpeedControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpSpeedControl.Size = new System.Drawing.Size(75, 126);
+            this.TlpSpeedControl.TabIndex = 18;
+            // 
+            // TbSpeed
+            // 
+            this.TbSpeed.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TbSpeed.LargeChange = 100;
+            this.TbSpeed.Location = new System.Drawing.Point(3, 3);
+            this.TbSpeed.Maximum = 4000;
+            this.TbSpeed.Minimum = 10;
+            this.TbSpeed.Name = "TbSpeed";
+            this.TbSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.TbSpeed.Size = new System.Drawing.Size(69, 100);
+            this.TbSpeed.SmallChange = 50;
+            this.TbSpeed.TabIndex = 16;
+            this.TbSpeed.TickFrequency = 200;
+            this.TbSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.TbSpeed.Value = 1000;
+            this.TbSpeed.ValueChanged += new System.EventHandler(this.TbSpeed_ValueChanged);
+            // 
+            // LblSpeed
+            // 
+            this.LblSpeed.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblSpeed.AutoSize = true;
+            this.LblSpeed.Location = new System.Drawing.Point(10, 106);
+            this.LblSpeed.Name = "LblSpeed";
+            this.LblSpeed.Size = new System.Drawing.Size(55, 20);
+            this.LblSpeed.TabIndex = 17;
+            this.LblSpeed.Text = "F1000";
+            // 
+            // TlpStepControl
+            // 
+            this.TlpStepControl.AutoSize = true;
+            this.TlpStepControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.TlpStepControl.ColumnCount = 1;
+            this.TlpStepControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TlpStepControl.Controls.Add(this.TbStep, 0, 0);
+            this.TlpStepControl.Controls.Add(this.LblStep, 0, 1);
+            this.TlpStepControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TlpStepControl.Location = new System.Drawing.Point(204, 0);
+            this.TlpStepControl.Margin = new System.Windows.Forms.Padding(0);
+            this.TlpStepControl.Name = "TlpStepControl";
+            this.TlpStepControl.RowCount = 2;
+            this.tlp.SetRowSpan(this.TlpStepControl, 3);
+            this.TlpStepControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TlpStepControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpStepControl.Size = new System.Drawing.Size(75, 126);
+            this.TlpStepControl.TabIndex = 19;
+            // 
             // TbStep
             // 
             this.TbStep.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -405,6 +369,45 @@
             0});
             this.TbStep.ValueChanged += new System.EventHandler(this.TbStep_ValueChanged);
             // 
+            // LblStep
+            // 
+            this.LblStep.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblStep.AutoSize = true;
+            this.LblStep.Location = new System.Drawing.Point(24, 106);
+            this.LblStep.Name = "LblStep";
+            this.LblStep.Size = new System.Drawing.Size(27, 20);
+            this.LblStep.TabIndex = 18;
+            this.LblStep.Text = "10";
+            // 
+            // TlpZControl
+            // 
+            this.TlpZControl.ColumnCount = 1;
+            this.TlpZControl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TlpZControl.Controls.Add(this.BtnZup01, 0, 3);
+            this.TlpZControl.Controls.Add(this.BtnZup1, 0, 2);
+            this.TlpZControl.Controls.Add(this.BtnZup10, 0, 1);
+            this.TlpZControl.Controls.Add(this.BtnZdown10, 0, 6);
+            this.TlpZControl.Controls.Add(this.BtnZdown1, 0, 5);
+            this.TlpZControl.Controls.Add(this.BtnZdown01, 0, 5);
+            this.TlpZControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TlpZControl.Location = new System.Drawing.Point(184, 0);
+            this.TlpZControl.Margin = new System.Windows.Forms.Padding(0);
+            this.TlpZControl.Name = "TlpZControl";
+            this.TlpZControl.RowCount = 9;
+            this.tlp.SetRowSpan(this.TlpZControl, 3);
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TlpZControl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TlpZControl.Size = new System.Drawing.Size(20, 126);
+            this.TlpZControl.TabIndex = 20;
+            this.TlpZControl.Visible = false;
+            // 
             // BtnZup01
             // 
             this.BtnZup01.AltImage = null;
@@ -419,7 +422,7 @@
             0,
             0,
             65536});
-            this.BtnZup01.Location = new System.Drawing.Point(2, 37);
+            this.BtnZup01.Location = new System.Drawing.Point(2, 47);
             this.BtnZup01.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZup01.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZup01.MinimumSize = new System.Drawing.Size(16, 16);
@@ -447,7 +450,7 @@
             0,
             0,
             65536});
-            this.BtnZup1.Location = new System.Drawing.Point(2, 21);
+            this.BtnZup1.Location = new System.Drawing.Point(2, 31);
             this.BtnZup1.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZup1.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZup1.MinimumSize = new System.Drawing.Size(16, 16);
@@ -475,7 +478,7 @@
             0,
             0,
             65536});
-            this.BtnZup10.Location = new System.Drawing.Point(2, 5);
+            this.BtnZup10.Location = new System.Drawing.Point(2, 15);
             this.BtnZup10.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZup10.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZup10.MinimumSize = new System.Drawing.Size(16, 16);
@@ -503,7 +506,7 @@
             0,
             0,
             65536});
-            this.BtnZdown10.Location = new System.Drawing.Point(2, 105);
+            this.BtnZdown10.Location = new System.Drawing.Point(2, 95);
             this.BtnZdown10.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZdown10.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZdown10.MinimumSize = new System.Drawing.Size(16, 16);
@@ -531,7 +534,7 @@
             0,
             0,
             65536});
-            this.BtnZdown1.Location = new System.Drawing.Point(2, 89);
+            this.BtnZdown1.Location = new System.Drawing.Point(2, 79);
             this.BtnZdown1.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZdown1.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZdown1.MinimumSize = new System.Drawing.Size(16, 16);
@@ -559,7 +562,7 @@
             0,
             0,
             65536});
-            this.BtnZdown01.Location = new System.Drawing.Point(2, 73);
+            this.BtnZdown01.Location = new System.Drawing.Point(2, 63);
             this.BtnZdown01.Margin = new System.Windows.Forms.Padding(0);
             this.BtnZdown01.MaximumSize = new System.Drawing.Size(16, 16);
             this.BtnZdown01.MinimumSize = new System.Drawing.Size(16, 16);
@@ -573,26 +576,10 @@
             this.BtnZdown01.UseAltImage = false;
             this.BtnZdown01.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnZJogButtonMouseDown);
             // 
-            // BtnNE
+            // UpdateFMax
             // 
-            this.BtnNE.AltImage = null;
-            this.BtnNE.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BtnNE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.BtnNE.Caption = null;
-            this.BtnNE.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnNE.Image = null;
-            this.BtnNE.JogDirection = LaserGRBL.GrblCore.JogDirection.NE;
-            this.BtnNE.Location = new System.Drawing.Point(147, 3);
-            this.BtnNE.MaximumSize = new System.Drawing.Size(48, 48);
-            this.BtnNE.Name = "BtnNE";
-            this.BtnNE.RoundedBorders = false;
-            this.BtnNE.Size = new System.Drawing.Size(33, 33);
-            this.BtnNE.SizingMode = LaserGRBL.UserControls.ImageButton.SizingModes.StretchImage;
-            this.BtnNE.TabIndex = 12;
-            this.BtnNE.TabStop = false;
-            this.BtnNE.UseAltImage = false;
-            this.BtnNE.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseDown);
-            this.BtnNE.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnJogButtonMouseUp);
+            this.UpdateFMax.Interval = 1000;
+            this.UpdateFMax.Tick += new System.EventHandler(this.UpdateFMax_Tick);
             // 
             // JogForm
             // 
@@ -609,10 +596,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.TbSpeed)).EndInit();
             this.TlpStepControl.ResumeLayout(false);
             this.TlpStepControl.PerformLayout();
-            this.TlpZControl.ResumeLayout(false);
-            this.TlpZControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TbStep)).EndInit();
+            this.TlpZControl.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
@@ -643,6 +630,5 @@
         private DirectionStepButton BtnZup01;
         private DirectionStepButton BtnZup1;
         private DirectionStepButton BtnZup10;
-        private System.Windows.Forms.Label label1;
     }
 }
