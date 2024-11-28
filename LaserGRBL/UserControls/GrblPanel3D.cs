@@ -50,6 +50,9 @@ namespace LaserGRBL.UserControls
 		// open gl object
 		private OpenGL OpenGL;
 		private GPoint mLastWPos;
+		/// <summary>
+		/// 机台显示位置
+		/// </summary>
 		private GPoint mLastMPos;
 		private float mCurF;
 		private float mCurS;
@@ -722,6 +725,7 @@ namespace LaserGRBL.UserControls
 				}
 				text += $"\n进给速率和主轴速度(mm/s):{FormatCoord(mCurF)} {FormatCoord(mCurS)}";
 				text += $"\n方阻测量值:              {FormatCoord(Convert.ToInt32(SquareRVal))}	欧姆/平方";
+				text += $"\n电阻率测量值:              {FormatCoord(Convert.ToInt32(SquareRVal))}	欧姆.cm";
 				if (Core.CheckLimitPosiFlag) text += $"\n目标位置超限位，请在限位区域操作！";
 				Size size = MeasureText(text, font);
 				Point point = new Point(Width - size.Width - mPadding.Right, top);
@@ -1230,6 +1234,14 @@ namespace LaserGRBL.UserControls
 			);
 		}
 
+		public GPoint AxisPosiScaleConvert(GPoint origionPosi_) {
+			GPoint newPosi = new GPoint() { 
+				X= (float)(origionPosi_.X*Core.SoftAxisDataScale[0]),
+				Y=(float)(origionPosi_.Y*Core.SoftAxisDataScale[1]),
+				Z=(float)(origionPosi_.Z/Core.SoftAxisDataScale[2]),
+			};
+			return newPosi;
+		}
 		PeriodicEventTimer InvalidateTimer = new Tools.PeriodicEventTimer(TimeSpan.FromSeconds(1), true);
 		/// <summary>
 		/// 数据更新事件
@@ -1240,6 +1252,7 @@ namespace LaserGRBL.UserControls
 			{
 				mLastWPos = Core.WorkPosition;
 				mLastMPos = Core.MachinePosition;
+				//mLastMPos=AxisPosiScaleConvert(Core.MachinePosition);
 				//数值转换为mm/s
 				mCurF = ValMinuteToSecond(Core.CurrentF);
 				mCurS = ValMinuteToSecond(Core.CurrentS);
@@ -1249,7 +1262,18 @@ namespace LaserGRBL.UserControls
 			if (InvalidateTimer.Expired)
 				Invalidate();
 		}
-		
+		/// <summary>
+		/// 坐标转换
+		/// </summary>
+		/// <param name="posi_"></param>
+		/// <returns></returns>
+		public double ConvertPosi(double posi_) {	
+			for (int i=0;i<Core.SoftAxisDataScale.Length;i++) {
+				posi_ *= Core.SoftAxisDataScale[i];
+
+			}
+			return posi_;
+		}
 
 		private void Grbl3D_OnLoadingPercentageChange()
 		{

@@ -847,7 +847,7 @@ namespace LaserGRBL
 		#region 标题栏按钮
 		private void facebookCommunityToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://www.facebook.com/groups/486886768471991");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 		private void MNGrblEmulator_Click(object sender, EventArgs e)
 		{
@@ -857,7 +857,7 @@ namespace LaserGRBL
 		private void donateToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			//打开网址（捐款）
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/donate");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 		private void installCH340DriverToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -872,7 +872,7 @@ namespace LaserGRBL
 		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			//官网网址打开
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/faq/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/product/Square-R.html");
 		}
 
 		private void helpOnLineToolStripMenuItem_Click(object sender, EventArgs e)
@@ -883,27 +883,27 @@ namespace LaserGRBL
 
 		private void orturSupportGroupToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturfacebook/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/product/Square-R.html");
 		}
 
 		private void orturWebsiteToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturwebsite/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/product/Square-R.html");
 		}
 
 		private void youtubeChannelToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/orturYTchannel/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 
 		private void firmwareToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-firmware/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 
 		private void manualsDownloadToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortur-manuals/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 		private void MnGrayscaleTest_Click(object sender, EventArgs e)
 		{
@@ -930,7 +930,7 @@ namespace LaserGRBL
 		}
 		private void orturSupportAndFeedbackToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Tools.Utils.OpenLink(@"https://lasergrbl.com/ortursupport/");
+			Tools.Utils.OpenLink(@"http://www.sinoprime.com.cn/");
 		}
 		private void styleToolStripMenuItem_Click(object sender, EventArgs e)
 		{

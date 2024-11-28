@@ -39,6 +39,15 @@ namespace LaserGRBL
 		/// 限位标志
 		/// </summary>
 		public bool CheckLimitPosiFlag = false;
+		/// <summary>
+		/// 数据运算枚举
+		/// </summary>
+		public enum DataOperation {
+			Add,
+			Sub,
+			Div,
+			Mul,
+		};
 
 		[Serializable]
 		public class ThreadingMode
@@ -336,11 +345,11 @@ namespace LaserGRBL
 		/// <summary>
 		/// 软件正限位，依次为X,Y,Z,A,B
 		/// </summary>
-		public double[] SoftPosLimitPosi = new double[5];
+		public double[] SoftPosLimitPosi = new double[5] { 285,275,15,100,100};
 		/// <summary>
 		/// 软件负限位，依次为X,Y,Z,A,B
 		/// </summary>
-		public double[] SoftNegLimitPosi = new double[5];
+		public double[] SoftNegLimitPosi = new double[5] { -5,-5,-1,-1,-1};
 		/// <summary>
 		/// 软件正限位预留量
 		/// </summary>
@@ -349,6 +358,11 @@ namespace LaserGRBL
 		/// 软件负限位预留量
 		/// </summary>
 		public double[] SoftNegLDistance = new double[5];
+		/// <summary>
+		/// 软件XYZAB轴比例尺
+		/// </summary>
+		public double[] SoftAxisDataScale = new double[5] { 1,1,20,1,1} ;
+
 
 		public RetainedSetting<bool> ShowLaserOffMovements { get; } = new RetainedSetting<bool>("ShowLaserOffMovements", true);
         public RetainedSetting<bool> ShowExecutedCommands { get; } = new RetainedSetting<bool>("ShowExecutedCommands", true);
@@ -407,14 +421,6 @@ namespace LaserGRBL
 
 			if (GrblVersion != null)
 				CSVD.LoadAppropriateCSV(GrblVersion); //load setting for last known version
-			#region 限位初始化设置
-			SoftPosLimitPosi[0] = 285;
-			SoftPosLimitPosi[1] = 275;
-			SoftPosLimitPosi[2] = 1000;
-			SoftNegLimitPosi[0] = -5;
-			SoftNegLimitPosi[1] = -5;
-			SoftNegLimitPosi[2] = -1000;
-			#endregion
 		}
 
 		internal void HotKeyOverride(HotKeysManager.HotKey.Actions action)
@@ -1597,11 +1603,15 @@ namespace LaserGRBL
 
 		public bool InProgram
 		{ get { return mTP.InProgram; } }
-
+		/// <summary>
+		/// 机器位置
+		/// </summary>
 		public GPoint MachinePosition
-		{ get { return mMPos; } }
-
-		public GPoint WorkPosition //WCO = MPos - WPos
+		{ get { return AxisPosiScaleConvert(mMPos,DataOperation.Div); } }
+		/// <summary>
+		/// 视图位置 WCO = MPos - WPos
+		/// </summary>
+		public GPoint WorkPosition 
 		{ get { return mMPos - mWCO; } }
 
 		public GPoint WorkingOffset
@@ -1641,6 +1651,46 @@ namespace LaserGRBL
 
 		#endregion
 		#region 常规运动控制相关
+		/// <summary>
+		/// 数据比例尺转换
+		/// </summary>
+		/// <param name="origionPosi_"></param>
+		/// <param name="dataOperation_"></param>
+		/// <returns></returns>
+		public GPoint AxisPosiScaleConvert(GPoint origionPosi_,DataOperation dataOperation_)
+		{
+			GPoint newPosi=new GPoint();
+			if (dataOperation_ == DataOperation.Mul) {
+				newPosi = new GPoint()
+				{
+					X = (float)(origionPosi_.X * SoftAxisDataScale[0]),
+					Y = (float)(origionPosi_.Y * SoftAxisDataScale[1]),
+					Z = (float)(origionPosi_.Z * SoftAxisDataScale[2]),
+				};
+			} else if (dataOperation_ == DataOperation.Div) {
+				newPosi = new GPoint()
+				{
+					X = (float)(origionPosi_.X / SoftAxisDataScale[0]),
+					Y = (float)(origionPosi_.Y / SoftAxisDataScale[1]),
+					Z = (float)(origionPosi_.Z / SoftAxisDataScale[2]),
+				};
+			} else if (dataOperation_ == DataOperation.Add) {
+				newPosi = new GPoint()
+				{
+					X = (float)(origionPosi_.X + SoftAxisDataScale[0]),
+					Y = (float)(origionPosi_.Y + SoftAxisDataScale[1]),
+					Z = (float)(origionPosi_.Z + SoftAxisDataScale[2]),
+				};
+			} else if (dataOperation_ == DataOperation.Sub) {
+				newPosi = new GPoint()
+				{
+					X = (float)(origionPosi_.X - SoftAxisDataScale[0]),
+					Y = (float)(origionPosi_.Y - SoftAxisDataScale[1]),
+					Z = (float)(origionPosi_.Z - SoftAxisDataScale[2]),
+				};
+			}
+			return newPosi;
+		}
 		public bool CheckLimitPosi(GPoint point_)
 		{
 			if (point_.X < SoftNegLimitPosi[0] || point_.Y < SoftNegLimitPosi[1] || point_.Z < SoftNegLimitPosi[2])
@@ -1847,9 +1897,9 @@ namespace LaserGRBL
 				if (dir == JogDirection.SW || dir == JogDirection.S || dir == JogDirection.SE)
 					cmd += $"Y-{step.ToString("0.0", NumberFormatInfo.InvariantInfo)}";
 				if (dir == JogDirection.Zdown)
-					cmd += $"Z-{step.ToString("0.0", NumberFormatInfo.InvariantInfo)}";
+					cmd += $"Z-{(step * (decimal)SoftAxisDataScale[2]).ToString("0.0", NumberFormatInfo.InvariantInfo)}";
 				if (dir == JogDirection.Zup)
-					cmd += $"Z{step.ToString("0.0", NumberFormatInfo.InvariantInfo)}";
+					cmd += $"Z{(step * (decimal)SoftAxisDataScale[2]).ToString("0.0", NumberFormatInfo.InvariantInfo)}";
 
 				cmd += $"F{speed}";
 
@@ -4714,12 +4764,10 @@ namespace LaserGRBL
 	}
 }
 
-/*
-Idle: All systems are go, no motions queued, and it's ready for anything.
-Run: Indicates a cycle is running.
-Hold: A feed hold is in process of executing, or slowing down to a stop. After the hold is complete, Grbl will remain in Hold and wait for a cycle start to resume the program.
-Door: (New in v0.9i) This compile-option causes Grbl to feed hold, shut-down the spindle and coolant, and wait until the door switch has been closed and the user has issued a cycle start. Useful for OEM that need safety doors.
-Home: In the middle of a homing cycle. NOTE: Positions are not updated live during the homing cycle, but they'll be set to the home position once done.
-Alarm: This indicates something has gone wrong or Grbl doesn't know its position. This state locks out all G-code commands, but allows you to interact with Grbl's settings if you need to. '$X' kill alarm lock releases this state and puts Grbl in the Idle state, which will let you move things again. As said before, be cautious of what you are doing after an alarm.
-Check: Grbl is in check G-code mode. It will process and respond to all G-code commands, but not motion or turn on anything. Once toggled off with another '$C' command, Grbl will reset itself.
-*/
+//空闲：所有系统均已启动，没有排队的动作，并且已做好一切准备。
+//运行：表示循环正在运行。
+//保持：进给保持正在执行中，或正在减速至停止。保持完成后，Grbl 将保持保持并等待循环启动以恢复程序。
+//门：（v0.9i 中的新功能）此编译选项使 Grbl 保持进给，关闭主轴和冷却液，并等待门开关关闭且用户发出循环启动。对于需要安全门的 OEM 很有用。
+//归位：在归位循环的中间。注意：在归位循环期间不会实时更新位置，但完成后将设置为归位位置。
+//警报：这表示出现问题或 Grbl 不知道其位置。此状态会锁定所有 G 代码命令，但允许您在需要时与 Grbl 的设置进行交互。 '$X' 终止警报锁会释放此状态并将 Grbl 置于空闲状态，这将允许您再次移动物体。如前所述，在警报后要谨慎行事。
+//检查：Grbl 处于检查 G 代码模式。它将处理并响应所有 G 代码命令，但不会移动或打开任何东西。一旦使用另一个 '$C' 命令关闭，Grbl 将自行重置。
