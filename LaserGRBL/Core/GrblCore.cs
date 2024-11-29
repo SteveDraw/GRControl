@@ -345,11 +345,11 @@ namespace LaserGRBL
 		/// <summary>
 		/// 软件正限位，依次为X,Y,Z,A,B
 		/// </summary>
-		public double[] SoftPosLimitPosi = new double[5] { 285,275,15,100,100};
+		public double[] SoftPosLimitPosi = new double[5] { 275,200,15,100,100};
 		/// <summary>
 		/// 软件负限位，依次为X,Y,Z,A,B
 		/// </summary>
-		public double[] SoftNegLimitPosi = new double[5] { -5,-5,-1,-1,-1};
+		public double[] SoftNegLimitPosi = new double[5] { -2,-2,-2,-1,-1};
 		/// <summary>
 		/// 软件正限位预留量
 		/// </summary>
